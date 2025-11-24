@@ -51,7 +51,7 @@ namespace TeachersRating.API.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("ParentCommentId")
+                    b.Property<Guid?>("ParentCommentId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("WorkerId")
@@ -249,8 +249,7 @@ namespace TeachersRating.API.Data.Migrations
                     b.HasOne("TeachersRating.API.Entities.Comment", "ParentComment")
                         .WithMany("Replies")
                         .HasForeignKey("ParentCommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("TeachersRating.API.Entities.Worker", "Worker")
                         .WithMany("Comments")

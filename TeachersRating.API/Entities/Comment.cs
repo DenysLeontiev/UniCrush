@@ -7,7 +7,7 @@ public class Comment : BaseEntity
     public Guid WorkerId { get; set; }
     public Worker? Worker { get; set; } = null;
 
-    public Guid ParentCommentId { get; set; }
+    public Guid? ParentCommentId { get; set; }
     public Comment? ParentComment { get; set; }
 
     public ICollection<Comment> Replies { get; set; } = new List<Comment>();
