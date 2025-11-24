@@ -136,4 +136,16 @@ public static class EntityMappingExtensions
             IsDeleted = usersOnlineStat.IsDeleted
         };
     }
+
+    public static CommentDto ToDto(this Comment comment)
+    {
+        return new CommentDto
+        {
+            Id = comment.Id,
+            Content = comment.Content,
+            DateCreated = comment.DateCreated,
+            DateModified = comment.DateModified,
+            ParentCommentId = comment.ParentCommentId
+        };
+    }
 }
