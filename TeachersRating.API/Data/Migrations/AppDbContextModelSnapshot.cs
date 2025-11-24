@@ -51,10 +51,15 @@ namespace TeachersRating.API.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("ParentCommentId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("WorkerId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentCommentId");
 
                     b.HasIndex("WorkerId");
 
@@ -241,11 +246,19 @@ namespace TeachersRating.API.Data.Migrations
 
             modelBuilder.Entity("TeachersRating.API.Entities.Comment", b =>
                 {
+                    b.HasOne("TeachersRating.API.Entities.Comment", "ParentComment")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TeachersRating.API.Entities.Worker", "Worker")
                         .WithMany("Comments")
                         .HasForeignKey("WorkerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ParentComment");
 
                     b.Navigation("Worker");
                 });
@@ -270,6 +283,11 @@ namespace TeachersRating.API.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Photo");
+                });
+
+            modelBuilder.Entity("TeachersRating.API.Entities.Comment", b =>
+                {
+                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("TeachersRating.API.Entities.Institute", b =>
