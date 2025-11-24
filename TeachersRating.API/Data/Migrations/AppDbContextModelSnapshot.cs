@@ -32,6 +32,35 @@ namespace TeachersRating.API.Data.Migrations
                     b.ToTable("DepartmentWorker");
                 });
 
+            modelBuilder.Entity("TeachersRating.API.Entities.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("WorkerId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkerId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("TeachersRating.API.Entities.Department", b =>
                 {
                     b.Property<Guid>("Id")
@@ -210,6 +239,17 @@ namespace TeachersRating.API.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TeachersRating.API.Entities.Comment", b =>
+                {
+                    b.HasOne("TeachersRating.API.Entities.Worker", "Worker")
+                        .WithMany("Comments")
+                        .HasForeignKey("WorkerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Worker");
+                });
+
             modelBuilder.Entity("TeachersRating.API.Entities.Department", b =>
                 {
                     b.HasOne("TeachersRating.API.Entities.Institute", "Institute")
@@ -240,6 +280,11 @@ namespace TeachersRating.API.Data.Migrations
             modelBuilder.Entity("TeachersRating.API.Entities.Photo", b =>
                 {
                     b.Navigation("Worker");
+                });
+
+            modelBuilder.Entity("TeachersRating.API.Entities.Worker", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

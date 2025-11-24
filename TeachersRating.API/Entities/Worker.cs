@@ -13,4 +13,5 @@ public class Worker : BaseEntity
     public uint NumberOfDislikes { get; set; }
 
     public ICollection<Department> Departments { get; set; } = new List<Department>();
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }
