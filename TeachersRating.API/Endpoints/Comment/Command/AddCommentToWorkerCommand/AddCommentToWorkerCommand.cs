@@ -10,7 +10,7 @@ public class AddCommentToWorkerCommand : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("comment/{workerId:guid}", async ([FromRoute] Guid workerId, [FromBody] AddCommentDto addCommentDto, [FromServices] AppDbContext context) =>
+        app.MapPost("comments/{workerId:guid}", async ([FromRoute] Guid workerId, [FromBody] AddCommentDto addCommentDto, [FromServices] AppDbContext context) =>
         {
             var worker = await context.Workers.Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id.Equals(workerId));
 
