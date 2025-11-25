@@ -6,5 +6,6 @@ public class CommentDto
     public DateTime DateCreated { get; set; }
     public DateTime DateModified { get; set; }
     public string Content { get; set; } = string.Empty;
+    public Guid WorkerId { get; set; }
     public Guid? ParentCommentId { get; set; }
 }

@@ -145,6 +145,7 @@ public static class EntityMappingExtensions
             Content = comment.Content,
             DateCreated = comment.DateCreated,
             DateModified = comment.DateModified,
+            WorkerId = comment.WorkerId,
             ParentCommentId = comment.ParentCommentId
         };
     }
