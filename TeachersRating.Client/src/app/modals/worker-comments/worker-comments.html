@@ -1,0 +1,48 @@
+<div class="comments-container">
+    <header class="modal-header">
+        <h2>Коментарі</h2>
+    </header>
+
+    <div class="comment-input-section">
+        <textarea 
+            class="styled-input" 
+            placeholder="Пиши сюди..." 
+            rows="3"
+            [(ngModel)]="newCommentText"
+            [disabled]="isSubmitting"></textarea>
+        <div class="input-actions">
+            <button 
+                class="btn-primary" 
+                (click)="onAddComment()"
+                [disabled]="!newCommentText.trim() || isSubmitting">
+                {{ isSubmitting ? 'Додається...' : 'Додати коментар' }}
+            </button>
+        </div>
+    </div>
+
+    <div class="comments-list" (scroll)="onScroll($event)">
+        @let paginatedComments = (commentsService.commentsForWorker$ | async);
+        @for (item of paginatedComments?.items; track item.id || $index) {
+        <div class="comment-card">
+            <div class="card-meta">
+                <span class="user-name">Користувач</span>
+                <span class="separator">•</span>
+                <span class="time">{{item.dateCreated | date}}</span>
+            </div>
+            <div class="card-body">
+                {{item.content}}
+            </div>
+        </div>
+        }
+        
+        @if(isLoadingMore) {
+            <div class="loading-indicator">
+                <p>Завантаження...</p>
+            </div>
+        }
+        
+        @if(paginatedComments?.items?.length === 0 && !isLoadingMore) {
+            <h2>Немає</h2>
+        }
+    </div>
+</div>

@@ -32,7 +32,7 @@ public class AddCommentToWorkerCommand : IEndpoint
             {
                 Content = addCommentDto.Content,
                 WorkerId = workerId,
-                ParentCommentId = (Guid)addCommentDto.ParentCommentId!,
+                ParentCommentId = addCommentDto.ParentCommentId,
             };
 
             await context.Comments.AddAsync(commentToAdd);

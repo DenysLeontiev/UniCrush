@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeachersRating.API.Data;
 using TeachersRating.API.DataStructures;
+using TeachersRating.API.DTOs;
 using TeachersRating.API.Extensions;
 using TeachersRating.API.Interfaces;
 using TeachersRating.API.Pagination;
@@ -25,10 +26,9 @@ public class GetCommentsForWorkerById : IEndpoint
                 return Results.BadRequest("Worker is not found.");
             }
 
-            int skipAmount = (commentsQueryParams.PageNumber - 1) * commentsQueryParams.PageSize;
-
             var query = context.Comments
                 .Where(x => x.WorkerId == workerId)
+                .OrderByDescending(x => x.DateCreated)
                 .AsNoTracking();
 
             var pagedComments = await PaginatedList<Entities.Comment>.CreateAsync(
@@ -36,9 +36,14 @@ public class GetCommentsForWorkerById : IEndpoint
                 commentsQueryParams.PageNumber,
                 commentsQueryParams.PageSize);
 
-            var mappedPagedComents = pagedComments.Select(x => x.ToDto());
+            var mappedPagedComments = new PaginatedList<CommentDto>(
+                pagedComments.Items.Select(x => x.ToDto()).ToList(),
+                pagedComments.TotalCount,
+                pagedComments.PageNumber,
+                pagedComments.PageSize
+            );
 
-            return Results.Ok(mappedPagedComents);
+            return Results.Ok(mappedPagedComments);
         });
     }
 }

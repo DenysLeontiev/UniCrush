@@ -4,7 +4,8 @@ import { CommentsQueryParams } from '../../models/queryParams/commentsQueryParam
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginatedList } from '../../models/pagination/paginatedList.model';
 import { Comment } from '../../models/comment.model';
-import { BehaviorSubject, Observable, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { AddComment } from '../../models/add-comment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +13,14 @@ import { BehaviorSubject, Observable, take, tap } from 'rxjs';
 export class CommentsService {
   private baseUrl: string = environment.baseUrl;
 
-  private commentsForWorkerSource: BehaviorSubject<Comment[]> = new BehaviorSubject<Comment[]>([]);
-  public commentsForWorker$: Observable<Comment[]> = this.commentsForWorkerSource.asObservable();
+  private commentsForWorkerSource: BehaviorSubject<PaginatedList<Comment> | null> = new BehaviorSubject<PaginatedList<Comment> | null>(null);
+  public commentsForWorker$: Observable<PaginatedList<Comment> | null> = this.commentsForWorkerSource.asObservable();
 
   private http = inject(HttpClient);
+
+  public getCurrentComments(): PaginatedList<Comment> | null {
+    return this.commentsForWorkerSource.getValue();
+  }
 
   public getPaginatedComments(workerId: string, commentsQueryParams: CommentsQueryParams) {
     const params = new HttpParams()
@@ -23,12 +28,55 @@ export class CommentsService {
       .set('PageSize', commentsQueryParams.pageSize);
 
     return this.http.get<PaginatedList<Comment>>(`${this.baseUrl}/comments/${workerId}`, { params }).pipe(
-      take(1),
-      tap(comments => {
-        const currentComments = this.commentsForWorkerSource.getValue();
-        const updatedComments = currentComments.concat(comments.items);
-        this.commentsForWorkerSource.next(updatedComments);
+      tap(response => {
+        console.log("comments response: ", response);
+
+        const current = this.commentsForWorkerSource.getValue();
+        
+        if (current && commentsQueryParams.pageNumber > 1) {
+          // Append items for pagination
+          const updatedItems = [...current.items, ...response.items];
+          const updated: PaginatedList<Comment> = {
+            ...response,
+            items: updatedItems
+          };
+          this.commentsForWorkerSource.next(updated);
+        } else {
+          // First page or reset
+          this.commentsForWorkerSource.next(response);
+        }
       })
     );
+  }
+
+  public addComment(workerId: string, addComment: AddComment) {
+    return this.http.post<Comment>(`${this.baseUrl}/comments/${workerId}`, addComment).pipe(tap(comment => {
+      const current = this.commentsForWorkerSource.getValue();
+      
+      if (current && Array.isArray(current.items)) {
+        // Update existing list
+        const updatedItems = [comment, ...current.items];
+        const updated: PaginatedList<Comment> = {
+          ...current,
+          items: updatedItems,
+          totalCount: current.totalCount + 1
+        };
+        this.commentsForWorkerSource.next(updated);
+      } else {
+        // Create new list if none exists or items is not an array
+        const newList: PaginatedList<Comment> = {
+          items: [comment],
+          totalCount: 1,
+          pageNumber: 1,
+          pageSize: 10,
+          totalPages: 1
+        };
+        this.commentsForWorkerSource.next(newList);
+      }
+    }));
+  }
+
+  public clearComments(): void {
+    this.commentsForWorkerSource.next(null);
   }
 }
