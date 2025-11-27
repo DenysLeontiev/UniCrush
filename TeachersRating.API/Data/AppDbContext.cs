@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Worker> Workers { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<UsersOnlineStat> UsersOnlineStats { get; set; }
+    public DbSet<Comment> Comments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,6 +20,12 @@ public class AppDbContext : DbContext
             .HasOne(w => w.Photo)
             .WithOne(p => p.Worker)
             .HasForeignKey<Worker>(w => w.PhotoId);
+        
+        modelBuilder.Entity<Comment>()
+            .HasOne(x => x.ParentComment)
+            .WithMany(x => x.Replies)
+            .HasForeignKey(x => x.ParentCommentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }
