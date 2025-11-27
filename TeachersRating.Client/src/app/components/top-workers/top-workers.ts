@@ -9,11 +9,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InstituteRenamePipe } from "../../pipes/institute-rename/institute-rename-pipe";
 import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { WorkerComments } from '../../modals/worker-comments/worker-comments';
-import { A11yModule } from "@angular/cdk/a11y";
 
 @Component({
   selector: 'app-top-workers',
-  imports: [CommonModule, FontAwesomeModule, RouterLink, InstituteRenamePipe, A11yModule],
+  imports: [CommonModule, FontAwesomeModule, RouterLink, InstituteRenamePipe],
   templateUrl: './top-workers.html',
   styleUrl: './top-workers.scss'
 })
