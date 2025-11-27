@@ -35,7 +35,7 @@ export class WorkerComments implements OnInit, OnDestroy {
   @HostListener('scroll', ['$event'])
   onScroll(event: any): void {
     const element = event.target;
-    const threshold = 100; // pixels from bottom to trigger load
+    const threshold = 100;
     const position = element.scrollTop + element.offsetHeight;
     const height = element.scrollHeight;
 

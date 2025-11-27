@@ -7,7 +7,7 @@ import { Department } from '../../models/department.model';
 import { Worker } from '../../models/worker.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InstituteRenamePipe } from "../../pipes/institute-rename/institute-rename-pipe";
-import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { WorkerComments } from '../../modals/worker-comments/worker-comments';
 
 @Component({
