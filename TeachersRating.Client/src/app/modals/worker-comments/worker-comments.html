@@ -4,17 +4,10 @@
     </header>
 
     <div class="comment-input-section">
-        <textarea 
-            class="styled-input" 
-            placeholder="Пиши сюди..." 
-            rows="3"
-            [(ngModel)]="newCommentText"
+        <textarea class="styled-input" placeholder="Пиши сюди..." rows="3" [(ngModel)]="newCommentText"
             [disabled]="isSubmitting"></textarea>
         <div class="input-actions">
-            <button 
-                class="btn-primary" 
-                (click)="onAddComment()"
-                [disabled]="!newCommentText.trim() || isSubmitting">
+            <button class="btn-primary" (click)="onAddComment()" [disabled]="!newCommentText.trim() || isSubmitting">
                 {{ isSubmitting ? 'Додається...' : 'Додати коментар' }}
             </button>
         </div>
@@ -34,15 +27,15 @@
             </div>
         </div>
         }
-        
+
         @if(isLoadingMore) {
-            <div class="loading-indicator">
-                <p>Завантаження...</p>
-            </div>
+        <div class="loading-indicator">
+            <p>Завантаження...</p>
+        </div>
         }
-        
+
         @if(paginatedComments?.items?.length === 0 && !isLoadingMore) {
-            <h2>Немає</h2>
+        <h2>Немає</h2>
         }
     </div>
 </div>
