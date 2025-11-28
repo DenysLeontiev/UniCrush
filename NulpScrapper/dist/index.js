@@ -7,7 +7,6 @@ const nulpUrl = "https://lpnu.ua";
 const institutesUrl = "https://lpnu.ua/institutes";
 const workersPageHref = '/kolektyv-pratsivnykiv-kafedry';
 const fileName = 'ouput1.json';
-const defaultWorkerImagePlaceholder = "defphoto2";
 const institutes = [];
 const departments = [];
 const workers = [];

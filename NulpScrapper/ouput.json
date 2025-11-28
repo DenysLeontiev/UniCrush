@@ -1377,6 +1377,22 @@
     },
     {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Паляниця Христина Богданівна",
+        "position": "асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Khrystyna.B.Palianytsia",
+        "department": {
+            "institute": {
+                "name": "Архітектури та дизайну інститут",
+                "href": "https://lpnu.ua/iard"
+            },
+            "href": "https://lpnu.ua/ap",
+            "longName": "Кафедра архітектурного проектування",
+            "shortName": "АП",
+            "workersPageHref": "https://lpnu.ua/ap/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
         "fullName": "Панчишин Ольга Євгенівна",
         "position": "асистент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Olha.Y.Panchyshyn",
@@ -1460,6 +1476,22 @@
         "fullName": "Хамар Ігор Григорович",
         "position": "асистент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Ihor.H.Khamar",
+        "department": {
+            "institute": {
+                "name": "Архітектури та дизайну інститут",
+                "href": "https://lpnu.ua/iard"
+            },
+            "href": "https://lpnu.ua/ap",
+            "longName": "Кафедра архітектурного проектування",
+            "shortName": "АП",
+            "workersPageHref": "https://lpnu.ua/ap/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Хоменко Уляна-Магдалина Володимирівна",
+        "position": "асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Uliana-Mahdalyna.V.Khomenko",
         "department": {
             "institute": {
                 "name": "Архітектури та дизайну інститут",
@@ -2144,6 +2176,22 @@
         }
     },
     {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/14777.jpg",
+        "fullName": "Диба Юрій Романович",
+        "position": "д.арх.,  доцент, \n професор",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Yurii.R.Dyba",
+        "department": {
+            "institute": {
+                "name": "Архітектури та дизайну інститут",
+                "href": "https://lpnu.ua/iard"
+            },
+            "href": "https://lpnu.ua/atr",
+            "longName": "Кафедра архітектури та реставрації",
+            "shortName": "АТР",
+            "workersPageHref": "https://lpnu.ua/atr/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
         "fullName": "Дубик Юрій Ярославович",
         "position": "доцент",
@@ -2612,6 +2660,22 @@
         "fullName": "Богуславський Максим Володимирович",
         "position": "асистент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Maksym.V.Bohuslavskyi",
+        "department": {
+            "institute": {
+                "name": "Архітектури та дизайну інститут",
+                "href": "https://lpnu.ua/iard"
+            },
+            "href": "https://lpnu.ua/vdm",
+            "longName": "Кафедра візуального дизайну і мистецтва",
+            "shortName": "ВДМ",
+            "workersPageHref": "https://lpnu.ua/vdm/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Бучковська Іванна Юріївна",
+        "position": "старший викладач закладу вищої освіти",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Ivanna.Y.Buchkovska",
         "department": {
             "institute": {
                 "name": "Архітектури та дизайну інститут",
@@ -4208,7 +4272,7 @@
         }
     },
     {
-        "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/85205.jpg",
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/31629.jpg",
         "fullName": "Оконченко Ольга Михайлівна",
         "position": "к.арх.,  доцент, \n доцент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Olha.M.Okonchenko",
@@ -7072,6 +7136,22 @@
         }
     },
     {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/100.jpg",
+        "fullName": "Ганзій Петро Михайлович",
+        "position": "асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Petro.M.Hanzii",
+        "department": {
+            "institute": {
+                "name": "Будівництва, інфраструктури та безпеки життєдіяльності",
+                "href": "https://lpnu.ua/ibib"
+            },
+            "href": "https://lpnu.ua/zvp",
+            "longName": "Кафедра загальновійськової підготовки",
+            "shortName": "ЗВП",
+            "workersPageHref": "https://lpnu.ua/zvp/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/68878.jpg",
         "fullName": "Горбатий Андрій Степанович",
         "position": "провідний фахівець",
@@ -7156,6 +7236,22 @@
         "fullName": "Криштанович Мирослав Франкович",
         "position": "д.держ.упр.,  професор, \n завідувач кафедри",
         "personalPageHref": "https://staff.lpnu.ua/profile/Myroslav.F.Kryshtanovych",
+        "department": {
+            "institute": {
+                "name": "Будівництва, інфраструктури та безпеки життєдіяльності",
+                "href": "https://lpnu.ua/ibib"
+            },
+            "href": "https://lpnu.ua/zvp",
+            "longName": "Кафедра загальновійськової підготовки",
+            "shortName": "ЗВП",
+            "workersPageHref": "https://lpnu.ua/zvp/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Олійник Сергій Едуардович",
+        "position": "старший викладач закладу вищої освіти",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Serhii.E.Oliinyk",
         "department": {
             "institute": {
                 "name": "Будівництва, інфраструктури та безпеки життєдіяльності",
@@ -8756,6 +8852,22 @@
         "fullName": "Дмитрук Вероніка Анатоліївна",
         "position": "к.т.н.,  доцент, \n доцент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Veronika.A.Dmytruk",
+        "department": {
+            "institute": {
+                "name": "Гуманітарних та соціальних наук інститут",
+                "href": "https://lpnu.ua/ihsn"
+            },
+            "href": "https://lpnu.ua/imts",
+            "longName": "Кафедра іноземних мов технічного спрямування",
+            "shortName": "ІМТС",
+            "workersPageHref": "https://lpnu.ua/imts/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/21147.jpg",
+        "fullName": "Драпалюк Галина Степанівна",
+        "position": "старший викладач закладу вищої освіти",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Halyna.S.Drapaliuk",
         "department": {
             "institute": {
                 "name": "Гуманітарних та соціальних наук інститут",
@@ -11476,6 +11588,22 @@
         "fullName": "Гулей Купріян Степанович",
         "position": "старший викладач закладу вищої освіти",
         "personalPageHref": "https://staff.lpnu.ua/profile/Kupriyan.S.Guley",
+        "department": {
+            "institute": {
+                "name": "Гуманітарних та соціальних наук інститут",
+                "href": "https://lpnu.ua/ihsn"
+            },
+            "href": "https://lpnu.ua/fv",
+            "longName": "Кафедра фізичного виховання",
+            "shortName": "ФВ",
+            "workersPageHref": "https://lpnu.ua/fv/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Деяк Маріанна Іванівна",
+        "position": "завідувач басейном",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Maryana.I.Deyak",
         "department": {
             "institute": {
                 "name": "Гуманітарних та соціальних наук інститут",
@@ -15762,7 +15890,7 @@
     {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/49454.jpg",
         "fullName": "Говда Галина Анатоліївна",
-        "position": "к.е.н.,  \n доцент",
+        "position": "к.е.н.,  доцент, \n доцент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Halyna.A.Hovda",
         "department": {
             "institute": {
@@ -19012,22 +19140,6 @@
         "fullName": "Бахор Зіновій Михайлович",
         "position": "к.т.н.,  доцент, \n доцент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Zinovii.M.Bakhor",
-        "department": {
-            "institute": {
-                "name": "Енергетики та систем керування інститут",
-                "href": "https://lpnu.ua/iesk"
-            },
-            "href": "https://lpnu.ua/esu",
-            "longName": "Кафедра електроенергетики та систем управління",
-            "shortName": "ЕСУ",
-            "workersPageHref": "https://lpnu.ua/esu/kolektyv-pratsivnykiv-kafedry"
-        }
-    },
-    {
-        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
-        "fullName": "Березюк Валерій Борисович",
-        "position": "інженер 2 категорії",
-        "personalPageHref": "https://staff.lpnu.ua/profile/",
         "department": {
             "institute": {
                 "name": "Енергетики та систем керування інститут",
@@ -25056,6 +25168,22 @@
         }
     },
     {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Торшин Віталій В'ячеславович",
+        "position": "асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Vitalii.V.Torshyn",
+        "department": {
+            "institute": {
+                "name": "Комп'ютерних наук та інформаційних технологій інститут",
+                "href": "https://lpnu.ua/ikni"
+            },
+            "href": "https://lpnu.ua/ism",
+            "longName": "Кафедра інформаційних систем та мереж",
+            "shortName": "ІСМ",
+            "workersPageHref": "https://lpnu.ua/ism/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/72847.jpg",
         "fullName": "Худий Андрій Михайлович",
         "position": "к.т.н.,  ст.наук.співробітник, \n доцент",
@@ -25652,6 +25780,22 @@
         "fullName": "Бернацька Наталія Любомирівна",
         "position": "к.т.н.,  \n асистент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Nataliia.L.Bernatska",
+        "department": {
+            "institute": {
+                "name": "Комп'ютерних наук та інформаційних технологій інститут",
+                "href": "https://lpnu.ua/ikni"
+            },
+            "href": "https://lpnu.ua/pz",
+            "longName": "Кафедра програмного забезпечення",
+            "shortName": "ПЗ",
+            "workersPageHref": "https://lpnu.ua/pz/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Білик Владислав Романович",
+        "position": "асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Vladyslav.R.Bilyk",
         "department": {
             "institute": {
                 "name": "Комп'ютерних наук та інформаційних технологій інститут",
@@ -28962,7 +29106,7 @@
     {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/60212.jpg",
         "fullName": "Костів Юрій Михайлович",
-        "position": "к.т.н.,  доцент, \n викладач",
+        "position": "к.т.н.,  доцент, \n доцент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Yurii.M.Kostiv",
         "department": {
             "institute": {
@@ -30674,7 +30818,7 @@
     {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
         "fullName": "Карпінський Роман Мирославович",
-        "position": "асистент",
+        "position": "док.філософії,  \n асистент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Roman.M.Karpinskyi",
         "department": {
             "institute": {
@@ -31812,6 +31956,22 @@
         "fullName": "Іванишин Алла Василівна",
         "position": "к.т.н.,  доцент, \n доцент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Alla.V.Hunkalo",
+        "department": {
+            "institute": {
+                "name": "Комп'ютерних технологій, автоматики та метрології інститут",
+                "href": "https://lpnu.ua/ikta"
+            },
+            "href": "https://lpnu.ua/ivt",
+            "longName": "Кафедра інформаційно-вимірювальних технологій",
+            "shortName": "ІВТ",
+            "workersPageHref": "https://lpnu.ua/ivt/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Івах Роман Михайлович",
+        "position": "к.т.н.,  доцент, \n доцент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Roman.M.Ivakh",
         "department": {
             "institute": {
                 "name": "Комп'ютерних технологій, автоматики та метрології інститут",
@@ -34820,6 +34980,22 @@
         "fullName": "Афтаназів Іван Семенович",
         "position": "д.т.н.,  професор, \n професор",
         "personalPageHref": "https://staff.lpnu.ua/profile/Ivan.S.Aftanaziv",
+        "department": {
+            "institute": {
+                "name": "Механічної інженерії та транспорту інститут",
+                "href": "https://lpnu.ua/imit"
+            },
+            "href": "https://lpnu.ua/tmih",
+            "longName": "Кафедра технічної механіки та інженерної графіки",
+            "shortName": "ТМІГ",
+            "workersPageHref": "https://lpnu.ua/tmih/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/4313.jpg",
+        "fullName": "Баран Наталія Миронівна",
+        "position": "к.т.н.,  \n асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Nataliia.M.Baran",
         "department": {
             "institute": {
                 "name": "Механічної інженерії та транспорту інститут",
@@ -40352,6 +40528,22 @@
         }
     },
     {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Войтович Наталія Олегівна",
+        "position": "к.соц.ком.,  доцент, \n доцент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Nataliia.O.Voitovych",
+        "department": {
+            "institute": {
+                "name": "Права, психології та інноваційної освіти інститут",
+                "href": "https://lpnu.ua/ippo"
+            },
+            "href": "https://lpnu.ua/zhzmk",
+            "longName": "Кафедра журналістики та засобів масової комунікації",
+            "shortName": "ЖЗМК",
+            "workersPageHref": "https://lpnu.ua/zhzmk/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/35921.jpg",
         "fullName": "Галаджун Зоряна Володимирівна",
         "position": "к.соц.ком.,  доцент, \n завідувач кафедри",
@@ -41440,6 +41632,22 @@
         }
     },
     {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Пліш Володимир Миколайович",
+        "position": "старший викладач закладу вищої освіти",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Volodymyr.M.Plish",
+        "department": {
+            "institute": {
+                "name": "Права, психології та інноваційної освіти інститут",
+                "href": "https://lpnu.ua/ippo"
+            },
+            "href": "https://lpnu.ua/pio",
+            "longName": "Кафедра педагогіки та інноваційної освіти",
+            "shortName": "ПІО",
+            "workersPageHref": "https://lpnu.ua/pio/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/92458.jpg",
         "fullName": "Рузяк Тетяна Іванівна",
         "position": "док.філософії,  \n доцент",
@@ -41764,6 +41972,22 @@
         "fullName": "Гузій Іванна Степанівна",
         "position": "док.філософії,  доцент, \n доцент",
         "personalPageHref": "https://staff.lpnu.ua/profile/Ivanna.S.Huzii",
+        "department": {
+            "institute": {
+                "name": "Права, психології та інноваційної освіти інститут",
+                "href": "https://lpnu.ua/ippo"
+            },
+            "href": "https://lpnu.ua/ppmz",
+            "longName": "Кафедра практичної психології ментального здоров'я",
+            "shortName": "ППМЗ",
+            "workersPageHref": "https://lpnu.ua/ppmz/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Джо Аліна Сергіївна",
+        "position": "асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Alina.S.Dzho",
         "department": {
             "institute": {
                 "name": "Права, психології та інноваційної освіти інститут",
@@ -42880,22 +43104,6 @@
         }
     },
     {
-        "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/80208.jpg",
-        "fullName": "Щербай Іванна Романівна",
-        "position": "асистент",
-        "personalPageHref": "https://staff.lpnu.ua/profile/Ivanna.R.Shcherbai",
-        "department": {
-            "institute": {
-                "name": "Права, психології та інноваційної освіти інститут",
-                "href": "https://lpnu.ua/ippo"
-            },
-            "href": "https://lpnu.ua/tpk",
-            "longName": "Кафедра теорії пpaвa та конституціоналізму",
-            "shortName": "ТПК",
-            "workersPageHref": "https://lpnu.ua/tpk/kolektyv-pratsivnykiv-kafedry"
-        }
-    },
-    {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/92892.jpg",
         "fullName": "Ярмол Лілія Володимирівна",
         "position": "д.юр.н.,  професор, \n професор",
@@ -42947,7 +43155,7 @@
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
         "fullName": "Боруцька Оксана Іванівна",
         "position": "фахівець",
-        "personalPageHref": "https://staff.lpnu.ua/profile/",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Oksana.I.Borutska",
         "department": {
             "institute": {
                 "name": "Права, психології та інноваційної освіти інститут",
@@ -44356,6 +44564,22 @@
         "fullName": "Маркович Богдан Михайлович",
         "position": "д.ф.-м.н.,  професор, \n професор",
         "personalPageHref": "https://staff.lpnu.ua/profile/Bohdan.M.Markovych",
+        "department": {
+            "institute": {
+                "name": "Прикладної математики та фундаментальних наук інститут",
+                "href": "https://lpnu.ua/imfn"
+            },
+            "href": "https://lpnu.ua/vm",
+            "longName": "Кафедра вищої математики",
+            "shortName": "ВМ",
+            "workersPageHref": "https://lpnu.ua/vm/kolektyv-pratsivnykiv-kafedry"
+        }
+    },
+    {
+        "imageUrl": "https://lpnu.ua/sites/default/files/staff/defphoto2.jpg",
+        "fullName": "Мендзів Мар'яна Вірославівна",
+        "position": "асистент",
+        "personalPageHref": "https://staff.lpnu.ua/profile/Mariana.V.Mendziv",
         "department": {
             "institute": {
                 "name": "Прикладної математики та фундаментальних наук інститут",
@@ -49810,7 +50034,7 @@
     {
         "imageUrl": "https://lpnu.ua/sites/default/files/staff/all/34486.jpg",
         "fullName": "Яцульчак Галина Володимирівна",
-        "position": "к.т.н.,  \n інженер 1 категорії",
+        "position": "к.т.н.,  \n провідний інженер",
         "personalPageHref": "https://staff.lpnu.ua/profile/",
         "department": {
             "institute": {
