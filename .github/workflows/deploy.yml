@@ -68,7 +68,7 @@ jobs:
             cd /root/LecturerSmash
             echo "Now in directory:"
             pwd
-            docker compose build
+            docker compose build --no-cache
             docker compose up -d
 
             echo "---------- Deployment complete ----------"
