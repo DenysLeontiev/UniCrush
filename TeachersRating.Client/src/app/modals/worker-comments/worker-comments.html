@@ -35,7 +35,11 @@
         }
 
         @if(paginatedComments?.items?.length === 0 && !isLoadingMore) {
-        <h2>Немає</h2>
+        <div class="no-comments-wrapper">
+            <fa-icon icon="ban"></fa-icon>
+            <h3>Немає коментарів</h3>
+            <p>Станьте першим, хто залишить коментар!</p>
+        </div>
         }
     </div>
 </div>

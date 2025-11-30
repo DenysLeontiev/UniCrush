@@ -1,11 +1,43 @@
+.page-header {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  background: linear-gradient(to bottom, #f5f5f5 0%, #ffffff 100%);
+
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.5px;
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #666;
+  }
+
+  @media (max-width: 480px) {
+    padding: 2rem 1rem 1.5rem;
+
+    .page-title {
+      font-size: 1.8rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+    }
+  }
+}
+
 .selection-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 200px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
-  background: #f5f5f5;
+  padding: 2rem 1rem;
+  background: #ffffff;
   box-sizing: border-box;
 }
 
@@ -13,20 +45,21 @@
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
   width: 100%;
   max-width: 500px;
 
   @media (max-width: 480px) {
     padding: 1.5rem;
-    margin: 1rem;
+    margin: 0 1rem;
   }
 }
 
 .top-workers-link {
   text-decoration: none;
   display: block;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .top-workers-btn {
@@ -45,10 +78,6 @@
   justify-content: center;
   gap: 0.5rem;
 
-  .icon {
-    font-size: 1.2rem;
-  }
-
   &:hover {
     background: #f8f9fa;
     border-color: #ccc;
@@ -60,15 +89,15 @@
   }
 }
 
-h1 {
+h3 {
   text-align: center;
   color: #333;
   margin: 0 0 2rem 0;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
 
   @media (max-width: 480px) {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     margin-bottom: 1.5rem;
   }
 }
@@ -153,8 +182,13 @@ h1 {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-message {

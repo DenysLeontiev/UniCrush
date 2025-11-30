@@ -7,7 +7,8 @@
   height: 100%;
   max-height: 80vh;
   box-sizing: border-box;
-  background-color: transparent; 
+  background-color: transparent;
+
   .modal-header {
     flex-shrink: 0;
     padding: 1rem;
@@ -31,9 +32,9 @@
     .styled-input {
       width: 100%;
       padding: 1rem;
-      border: 1px solid transparent; 
+      border: 1px solid transparent;
       background-color: #f5f7f9;
-      border-radius: 12px; 
+      border-radius: 12px;
       font-family: inherit;
       font-size: 0.95rem;
       resize: vertical;
@@ -58,7 +59,7 @@
       margin-top: 0.75rem;
 
       .btn-primary {
-        background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%); 
+        background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%);
         color: white;
         border: none;
         padding: 0.6rem 1.5rem;
@@ -95,9 +96,11 @@
     &::-webkit-scrollbar {
       width: 6px;
     }
+
     &::-webkit-scrollbar-track {
       background: transparent;
     }
+
     &::-webkit-scrollbar-thumb {
       background: #ddd;
       border-radius: 3px;
@@ -138,6 +141,51 @@
         white-space: pre-wrap;
       }
     }
+
+    .no-comments-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #95a5a6;
+      animation: fadeIn 0.3s ease-in;
+
+      fa-icon {
+        font-size: 4rem;
+        color: #dfe6e9;
+        margin-bottom: 1.5rem;
+        opacity: 0.7;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #7f8c8d;
+        letter-spacing: 0.3px;
+      }
+
+      p {
+        margin: 0.5rem 0 0 0;
+        font-size: 0.9rem;
+        color: #b2bec3;
+        max-width: 300px;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
   }
 
   .loading-indicator {

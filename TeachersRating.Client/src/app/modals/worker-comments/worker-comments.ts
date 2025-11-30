@@ -5,10 +5,11 @@ import { CommentsQueryParams } from '../../models/queryParams/commentsQueryParam
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AddComment } from '../../models/add-comment.model';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-worker-comments',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './worker-comments.html',
   styleUrl: './worker-comments.scss'
 })
