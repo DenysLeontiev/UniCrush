@@ -92,6 +92,7 @@ public static class EntityMappingExtensions
             Photo = worker.Photo?.ToDto() ?? new PhotoDto(),
             NumberOfLikes = worker.NumberOfLikes,
             NumberOfDislikes = worker.NumberOfDislikes,
+            NumberOfComments = worker.NumberOfComments,
             Departments = worker.Departments
                 .Select(d => new DepartmentSimpleDto
                 {

@@ -19,7 +19,9 @@ public class GetCommentsForWorkerById : IEndpoint
             [FromServices] AppDbContext context) =>
         {
 
-            var worker = await context.Workers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == workerId);
+            var worker = await context.Workers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == workerId);
 
             if (worker is null)
             {
@@ -28,6 +30,7 @@ public class GetCommentsForWorkerById : IEndpoint
 
             var query = context.Comments
                 .Where(x => x.WorkerId == workerId)
+                .Where(x => x.ParentCommentId == null)
                 .OrderByDescending(x => x.DateCreated)
                 .AsNoTracking();
 

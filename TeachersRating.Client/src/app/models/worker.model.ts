@@ -8,4 +8,5 @@ export interface Worker {
     numberOfLikes: number;
     numberOfDislikes: number;
     photo: Photo;
+    numberOfComments: number;
 }

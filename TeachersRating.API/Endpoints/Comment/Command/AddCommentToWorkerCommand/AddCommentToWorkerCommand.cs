@@ -35,6 +35,8 @@ public class AddCommentToWorkerCommand : IEndpoint
                 ParentCommentId = addCommentDto.ParentCommentId,
             };
 
+        worker.NumberOfComments++;
+            
             await context.Comments.AddAsync(commentToAdd);
 
             await context.SaveChangesAsync();
