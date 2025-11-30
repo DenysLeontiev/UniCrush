@@ -15,16 +15,49 @@
 
     <div class="comments-list" (scroll)="onScroll($event)">
         @let paginatedComments = (commentsService.commentsForWorker$ | async);
-        @for (item of paginatedComments?.items; track item.id || $index) {
-        <div class="comment-card">
+        @for (comment of paginatedComments?.items; track comment.id || $index) {
+        <div class="comment-card" [class.replying]="replyingToCommentId === comment.id">
             <div class="card-meta">
                 <span class="user-name">Користувач</span>
                 <span class="separator">•</span>
-                <span class="time">{{item.dateCreated | date}}</span>
+                <span class="time">{{comment.dateCreated | date}} ({{comment.numberOfReplies}})</span>
             </div>
             <div class="card-body">
-                {{item.content}}
+                {{comment.content}}
             </div>
+            <div class="card-actions">
+                <button class="btn-respond" 
+                        [class.active]="replyingToCommentId === comment.id"
+                        (click)="onRespondClick(comment.id)">
+                    {{ replyingToCommentId === comment.id ? 'Скасувати' : 'Відповісти' }}
+                </button>
+            </div>
+
+            @if(replyingToCommentId === comment.id) {
+            <div class="reply-section">
+                <div class="reply-header">
+                    <fa-icon icon="reply"></fa-icon>
+                    <span>Відповідь на коментар</span>
+                </div>
+                <textarea class="reply-input" 
+                          placeholder="Напишіть вашу відповідь..." 
+                          rows="2"
+                          [(ngModel)]="replyText"
+                          [disabled]="isSubmittingReply"></textarea>
+                <div class="reply-actions">
+                    <button class="btn-cancel" 
+                            (click)="cancelReply()"
+                            [disabled]="isSubmittingReply">
+                        Скасувати
+                    </button>
+                    <button class="btn-submit" 
+                            (click)="onSubmitReply(comment.id)"
+                            [disabled]="!replyText.trim() || isSubmittingReply">
+                        {{ isSubmittingReply ? 'Надсилання...' : 'Надіслати' }}
+                    </button>
+                </div>
+            </div>
+            }
         </div>
         }
 

@@ -19,6 +19,9 @@ export class WorkerComments implements OnInit, OnDestroy {
   public newCommentText: string = '';
   public isSubmitting: boolean = false;
   public isLoadingMore: boolean = false;
+  public replyingToCommentId: string | null = null;
+  public replyText: string = '';
+  public isSubmittingReply: boolean = false;
 
   private commentsQueryParams: CommentsQueryParams = new CommentsQueryParams();
   private canLoadMore: boolean = true;
@@ -110,5 +113,37 @@ export class WorkerComments implements OnInit, OnDestroy {
         this.isSubmitting = false;
       }
     });
+  }
+
+  public onRespondClick(commentId: string): void {
+    if (this.replyingToCommentId === commentId) {
+      this.cancelReply();
+    } else {
+      this.replyingToCommentId = commentId;
+      this.replyText = '';
+    }
+  }
+
+  public cancelReply(): void {
+    this.replyingToCommentId = null;
+    this.replyText = '';
+    this.isSubmittingReply = false;
+  }
+
+  public onSubmitReply(commentId: string): void {
+    if (!this.replyText.trim() || this.isSubmittingReply) {
+      return;
+    }
+
+    this.isSubmittingReply = true;
+    
+    // TODO: Implement reply submission logic
+    console.log('Submitting reply to comment:', commentId, this.replyText);
+    
+    // Simulate API call
+    setTimeout(() => {
+      this.isSubmittingReply = false;
+      this.cancelReply();
+    }, 1000);
   }
 }
