@@ -14,6 +14,7 @@ services:
       - ClientUrl=http://178.128.197.140:4200
     volumes:
       - /root/sqlite:/app/data
+    user: "1654:1654"  # Run as the same user that owns the DB files
   teachersratingclient:
     image:  teachersratingclient
     build: 
