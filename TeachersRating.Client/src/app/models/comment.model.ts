@@ -4,5 +4,6 @@ export interface Comment {
     dateModified: Date;
     content: string;
     workerId: string;
+    numberOfReplies: number;
     parentCommentId?: string;
 }

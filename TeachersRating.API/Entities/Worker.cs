@@ -11,7 +11,6 @@ public class Worker : BaseEntity
 
     public uint NumberOfLikes { get; set; }
     public uint NumberOfDislikes { get; set; }
-    public uint NumberOfComments { get; set; }
 
     public ICollection<Department> Departments { get; set; } = new List<Department>();
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();

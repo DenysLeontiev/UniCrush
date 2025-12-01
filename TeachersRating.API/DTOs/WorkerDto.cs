@@ -10,7 +10,7 @@ public class WorkerDto
     public string PersonalPageUrl { get; set; } = string.Empty;
     public uint NumberOfLikes { get; set; }
     public uint NumberOfDislikes { get; set; }
-    public uint NumberOfComments { get; set; }
+    public int NumberOfComments { get; set; }
     public PhotoDto Photo { get; set; } = new();
     public List<DepartmentSimpleDto> Departments { get; set; } = new();
 }

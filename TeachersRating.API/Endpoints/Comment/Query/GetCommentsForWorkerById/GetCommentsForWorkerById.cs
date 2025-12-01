@@ -31,6 +31,7 @@ public class GetCommentsForWorkerById : IEndpoint
             var query = context.Comments
                 .Where(x => x.WorkerId == workerId)
                 .Where(x => x.ParentCommentId == null)
+                .Include(x => x.Replies)
                 .OrderByDescending(x => x.DateCreated)
                 .AsNoTracking();
 
