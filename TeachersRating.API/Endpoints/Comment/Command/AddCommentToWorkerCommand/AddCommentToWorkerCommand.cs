@@ -35,12 +35,6 @@ public class AddCommentToWorkerCommand : IEndpoint
                 ParentCommentId = addCommentDto.ParentCommentId,
             };
 
-            // Only increment worker comment count for top-level comments
-            if (addCommentDto.ParentCommentId is null)
-            {
-                worker.NumberOfComments++;
-            }
-            
             await context.Comments.AddAsync(commentToAdd);
 
             await context.SaveChangesAsync();

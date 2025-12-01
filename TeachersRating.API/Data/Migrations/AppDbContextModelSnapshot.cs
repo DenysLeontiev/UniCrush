@@ -204,9 +204,6 @@ namespace TeachersRating.API.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("NumberOfComments")
-                        .HasColumnType("INTEGER");
-
                     b.Property<uint>("NumberOfDislikes")
                         .HasColumnType("INTEGER");
 
