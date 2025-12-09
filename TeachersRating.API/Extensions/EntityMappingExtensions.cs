@@ -92,7 +92,7 @@ public static class EntityMappingExtensions
             Photo = worker.Photo?.ToDto() ?? new PhotoDto(),
             NumberOfLikes = worker.NumberOfLikes,
             NumberOfDislikes = worker.NumberOfDislikes,
-            NumberOfComments = worker.NumberOfComments,
+            NumberOfComments = worker.Comments.Count,
             Departments = worker.Departments
                 .Select(d => new DepartmentSimpleDto
                 {
@@ -147,7 +147,8 @@ public static class EntityMappingExtensions
             DateCreated = comment.DateCreated,
             DateModified = comment.DateModified,
             WorkerId = comment.WorkerId,
-            ParentCommentId = comment.ParentCommentId
+            ParentCommentId = comment.ParentCommentId,
+            NumberOfReplies = comment.Replies.Count
         };
     }
 }

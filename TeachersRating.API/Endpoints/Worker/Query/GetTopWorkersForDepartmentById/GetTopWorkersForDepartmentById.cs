@@ -15,6 +15,7 @@ public class GetTopWorkersForDepartmentById : IEndpoint
             var topWorkers = await context.Workers
                                           .Where(x => x.Departments.Any(d => d.Id == departmentId))
                                           .Include(p => p.Photo)
+                                          .Include(x => x.Comments)
                                           .OrderByDescending(x => x.NumberOfLikes)
                                           .AsNoTracking()
                                           .ToListAsync();

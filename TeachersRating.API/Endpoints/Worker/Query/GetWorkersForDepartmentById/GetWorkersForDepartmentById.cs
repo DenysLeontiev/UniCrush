@@ -13,7 +13,7 @@ public class GetWorkersForDepartmentById : IEndpoint
         app.MapGet("/workers/{departmentId:guid}", async (Guid departmentId, [FromServices] AppDbContext context) =>
         {
             var workers = await context.Workers.Where(w => w.Departments.Any(d => d.Id == departmentId))
-                .Include(w => w.Photo)
+                .Include(x => x.Photo)
                 .AsNoTracking()
                 .ToListAsync();
 

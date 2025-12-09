@@ -8,4 +8,5 @@ public class CommentDto
     public string Content { get; set; } = string.Empty;
     public Guid WorkerId { get; set; }
     public Guid? ParentCommentId { get; set; }
+    public int NumberOfReplies { get; set; }
 }

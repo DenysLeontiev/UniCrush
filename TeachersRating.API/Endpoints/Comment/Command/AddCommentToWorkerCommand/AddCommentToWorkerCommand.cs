@@ -21,10 +21,10 @@ public class AddCommentToWorkerCommand : IEndpoint
 
             if (addCommentDto.ParentCommentId is not null)
             {
-                var parentExists = await context.Comments
-                    .AnyAsync(c => c.Id == addCommentDto.ParentCommentId && c.WorkerId == workerId);
+                var parentComment = await context.Comments
+                    .FirstOrDefaultAsync(c => c.Id == addCommentDto.ParentCommentId && c.WorkerId == workerId);
 
-                if (!parentExists)
+                if (parentComment is null)
                     return Results.BadRequest("Parent comment does not exist or does not belong to this worker.");
             }
 
@@ -35,8 +35,6 @@ public class AddCommentToWorkerCommand : IEndpoint
                 ParentCommentId = addCommentDto.ParentCommentId,
             };
 
-        worker.NumberOfComments++;
-            
             await context.Comments.AddAsync(commentToAdd);
 
             await context.SaveChangesAsync();
