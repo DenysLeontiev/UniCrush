@@ -6,10 +6,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AddComment } from '../../models/add-comment.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { UkrainianDatePipe } from '../../pipes/date/ukrainian-date-pipe';
 
 @Component({
   selector: 'app-worker-comments',
-  imports: [CommonModule, FormsModule, FontAwesomeModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, UkrainianDatePipe],
   templateUrl: './worker-comments.html',
   styleUrl: './worker-comments.scss'
 })

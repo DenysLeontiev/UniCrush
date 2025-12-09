@@ -6,11 +6,12 @@ import { ApiService } from '../../services/api.service';
 import { Institute } from '../../models/institute.model';
 import { Department } from '../../models/department.model';
 import { InstituteRenamePipe } from "../../pipes/institute-rename/institute-rename-pipe";
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-selection-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, InstituteRenamePipe],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, RouterLink, InstituteRenamePipe],
   templateUrl: './selection-form.component.html',
   styleUrl: './selection-form.component.scss'
 })
@@ -67,12 +68,12 @@ export class SelectionFormComponent implements OnInit {
 
   onDepartmentChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement | null;
-    if(!selectElement) return;
+    if (!selectElement) return;
     const departmentId = selectElement.value;
     const departmentName = selectElement.options[selectElement.selectedIndex].text;
 
     this.selectedDepartmentId.set(departmentId);
-    
+
     this.apiService.lastSelectedDepartmentName.set(departmentName);
   }
 

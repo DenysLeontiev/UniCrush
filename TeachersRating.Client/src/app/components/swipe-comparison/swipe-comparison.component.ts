@@ -82,7 +82,7 @@ export class SwipeComparisonComponent implements OnInit {
             } else {
               this.currentPair.set([winner, newWorker]);
             }
-            this.currentWinner.set(null); 
+            this.currentWinner.set(null);
             this.winnerPosition.set(null);
           } else {
             this.currentPair.set(workers);
