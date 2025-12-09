@@ -68,6 +68,10 @@ jobs:
             cd /root/LecturerSmash
             echo "Now in directory:"
             pwd
+            
+            docker system prune -a --volumes=false -f
+            docker builder prune --all -f
+            
             docker compose build --no-cache
             docker compose up -d
 
