@@ -1,44 +1,3 @@
-.swipe-header {
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  padding: 0.5rem 0.75rem;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  gap: 0.25rem;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #333;
-  transition: box-shadow 0.2s;
-  @media (max-width: 480px) {
-    max-width: 98vw;
-    font-size: 1rem;
-    padding: 0.4rem 0.3rem;
-  }
-}
-
-.department-name {
-  color: #2d6a4f;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  word-break: break-word;
-  text-align: center;
-  transition: color 0.2s;
-}
-
-.institute-name {
-  color: #457b9d;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  word-break: break-word;
-  text-align: center;
-  transition: color 0.2s;
-}
 .swipe-container {
   width: 100%;
   min-height: 100vh;
@@ -50,6 +9,113 @@
   background: #f5f5f5;
   touch-action: pan-y;
   user-select: none;
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+  }
+}
+
+.back-button-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+  touch-action: auto;
+  pointer-events: auto;
+  
+  @media (max-width: 480px) {
+    max-width: calc(100vw - 2rem);
+    margin-bottom: 0.75rem;
+  }
+}
+
+.back-btn {
+  padding: 0.75rem 1.25rem;
+  background: #fff;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  touch-action: auto;
+  pointer-events: auto;
+  
+  &:hover {
+    background: #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  .back-text {
+    @media (max-width: 480px) {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.7rem;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+}
+
+.swipe-header {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+  border-radius: 8px;
+  border-left: 3px solid #2d6a4f;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  
+  @media (max-width: 480px) {
+    max-width: calc(100vw - 2rem);
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.75rem;
+    border-left-width: 2px;
+  }
+}
+
+.department-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d6a4f;
+  margin-bottom: 0.15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+}
+
+.institute-name {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+  }
 }
 
 .comparison-area {
@@ -219,44 +285,6 @@
   }
 }
 
-.manual-controls {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  width: 100%;
-  max-width: 400px;
-  
-  @media (max-width: 480px) { gap: 0.5rem; }
-}
-
-.select-btn {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: white;
-  color: #333;
-  
-  &:hover:not(:disabled) {
-    background: #f8f9fa;
-    border-color: #ccc;
-  }
-  
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  @media (max-width: 480px) {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.8rem;
-  }
-}
-
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -281,4 +309,8 @@
 
 .comparison-area * {
   user-select: none;
+}
+
+.comparison-area {
+  touch-action: none;
 }

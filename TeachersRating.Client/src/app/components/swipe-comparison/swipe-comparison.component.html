@@ -1,7 +1,8 @@
 <div class="swipe-container" #container>
   <div class="back-button-container">
     <button class="back-btn" routerLink="/home">
-      <fa-icon icon="backward-step"></fa-icon> Назад
+      <fa-icon icon="backward-step"></fa-icon>
+      <span class="back-text">Назад</span>
     </button>
   </div>
   @if (apiService.lastSelectedDepartmentName() && apiService.lastSelectedInstituteName()) {
@@ -66,15 +67,5 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="manual-controls">
-    <button class="select-btn" (click)="selectLeft()" [disabled]="!canSwipe()">
-      Обрати зліва
-    </button>
-
-    <button class="select-btn" (click)="selectRight()" [disabled]="!canSwipe()">
-      Обрати справа
-    </button>
   </div>
 </div>

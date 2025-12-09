@@ -99,12 +99,15 @@ export class SwipeComparisonComponent implements OnInit {
 
   private setupGestureHandling() {
     const element = this.container.nativeElement;
+    const comparisonArea = element.querySelector('.comparison-area') as HTMLElement;
 
-    const mouseDown$ = fromEvent<MouseEvent>(element, 'mousedown');
+    if (!comparisonArea) return;
+
+    const mouseDown$ = fromEvent<MouseEvent>(comparisonArea, 'mousedown');
     const mouseMove$ = fromEvent<MouseEvent>(document, 'mousemove');
     const mouseUp$ = fromEvent<MouseEvent>(document, 'mouseup');
 
-    const touchStart$ = fromEvent<TouchEvent>(element, 'touchstart', { passive: false });
+    const touchStart$ = fromEvent<TouchEvent>(comparisonArea, 'touchstart', { passive: false });
     const touchMove$ = fromEvent<TouchEvent>(document, 'touchmove', { passive: false });
     const touchEnd$ = fromEvent<TouchEvent>(document, 'touchend');
 
@@ -176,7 +179,7 @@ export class SwipeComparisonComponent implements OnInit {
     return 'touches' in event ? event.touches[0].clientX : event.clientX;
   }
 
-  makeSelection(direction: 'left' | 'right') {
+  public makeSelection(direction: 'left' | 'right') {
     if (!this.canSwipe()) return;
 
     this.isAnimating.set(true);
@@ -188,15 +191,12 @@ export class SwipeComparisonComponent implements OnInit {
       const winner = actualDirection === 'right' ? pair[1] : pair[0];
       const loser = actualDirection === 'right' ? pair[0] : pair[1];
 
-      console.log(`Swipe: ${direction}, Interpreted as: ${actualDirection}, Selected: ${winner.fullName}, Rejected: ${loser.fullName}`);
-
       this.currentWinner.set(winner);
       this.winnerPosition.set(actualDirection === 'right' ? 'right' : 'left');
 
       this.apiService.likeWorker(winner.id).subscribe({
         next: (likedWorker) => {
           winner.numberOfLikes = likedWorker.numberOfLikes;
-          console.log('Choice recorded: ', likedWorker);
         },
         error: (error) => console.log('Failed to record choice:', error)
       });
@@ -204,7 +204,6 @@ export class SwipeComparisonComponent implements OnInit {
       this.apiService.dislikeWorker(loser.id).subscribe({
         next: (dislikedWorker) => {
           loser.numberOfDislikes = dislikedWorker.numberOfDislikes;
-          console.log('Choice recorded: ', dislikedWorker);
         },
         error: (error) => console.log('Failed to record choice:', error)
       });
@@ -233,17 +232,8 @@ export class SwipeComparisonComponent implements OnInit {
     this.swipeDirection.set(null);
   }
 
-  selectLeft() {
-    this.makeSelection('right');
-  }
-
-  selectRight() {
-    this.makeSelection('left');
-  }
-
-  toggleSwipeDirection() {
+  private toggleSwipeDirection() {
     this.normalSwipeDirection.update(current => !current);
-    console.log(`Swipe direction is now: ${this.normalSwipeDirection() ? 'Normal' : 'Inverted'}`);
   }
 
   public restart(): void {
