@@ -132,8 +132,8 @@ public static class EntityMappingExtensions
         {
             Id = usersOnlineStat.Id,
             NumberOfOnlineUsers = usersOnlineStat.NumberOfOnlineUsers,
-            DateCreated = usersOnlineStat.DateCreated,
-            DateModified = usersOnlineStat.DateModified,
+            DateCreated = usersOnlineStat.DateCreated.ToLocalTime(),
+            DateModified = usersOnlineStat.DateModified.ToLocalTime(),
             IsDeleted = usersOnlineStat.IsDeleted
         };
     }
@@ -144,8 +144,8 @@ public static class EntityMappingExtensions
         {
             Id = comment.Id,
             Content = comment.Content,
-            DateCreated = comment.DateCreated,
-            DateModified = comment.DateModified,
+            DateCreated = comment.DateCreated.ToLocalTime(),
+            DateModified = comment.DateModified.ToLocalTime(),
             WorkerId = comment.WorkerId,
             ParentCommentId = comment.ParentCommentId,
             NumberOfReplies = comment.Replies.Count

@@ -22,7 +22,7 @@ public class TrackOnlineUsersIteration : IContinuousWorkIteration
 
     public async Task Run(CancellationToken stoppingToken)
     {
-        int minutesAhead = 5;
+        int minutesAhead = 1;
 
         var now = DateTime.UtcNow;
         var nMinutesAhead = now.AddMinutes(minutesAhead);
