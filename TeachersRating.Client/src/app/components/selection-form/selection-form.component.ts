@@ -7,6 +7,8 @@ import { Institute } from '../../models/institute.model';
 import { Department } from '../../models/department.model';
 import { InstituteRenamePipe } from "../../pipes/institute-rename/institute-rename-pipe";
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { MatDialog } from '@angular/material/dialog';
+import { ShareModal } from '../../modals/share-modal/share-modal';
 
 @Component({
   selector: 'app-selection-form',
@@ -19,6 +21,8 @@ export class SelectionFormComponent implements OnInit {
   private apiService = inject(ApiService);
   private router = inject(Router);
 
+  private shareModal = inject(MatDialog);
+
   institutes = signal<Institute[]>([]);
   departments = signal<Department[]>([]);
   selectedInstituteId = signal<string>('');
@@ -30,6 +34,10 @@ export class SelectionFormComponent implements OnInit {
 
   ngOnInit() {
     this.loadInstitutes();
+  }
+
+  public openShareModal(): void {
+    this.shareModal.open(ShareModal);
   }
 
   private loadInstitutes() {
