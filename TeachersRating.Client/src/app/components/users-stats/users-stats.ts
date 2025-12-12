@@ -100,9 +100,9 @@ export class UsersStatsComponent implements OnInit, OnDestroy {
     };
 
     const today = new Date();
-    const lastWeek = new Date(today);
-    lastWeek.setDate(today.getDate() - 6);
-    this.range.setValue({ start: lastWeek, end: today });
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    this.range.setValue({ start: yesterday, end: today });
   }
 
   async ngOnInit() {
