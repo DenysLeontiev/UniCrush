@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.RegisterServices();
+
 builder.Services.AddContinuousBackgroundService<TrackOnlineUsersIteration>();
 
 builder.Services.RegisterDbContext(builder.Configuration);
