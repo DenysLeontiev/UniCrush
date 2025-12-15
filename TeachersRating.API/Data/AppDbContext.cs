@@ -20,12 +20,15 @@ public class AppDbContext : DbContext
             .HasOne(w => w.Photo)
             .WithOne(p => p.Worker)
             .HasForeignKey<Worker>(w => w.PhotoId);
-        
+
         modelBuilder.Entity<Comment>()
             .HasOne(x => x.ParentComment)
             .WithMany(x => x.Replies)
             .HasForeignKey(x => x.ParentCommentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UsersOnlineStat>()
+            .HasIndex(x => x.DateCreated);
 
         base.OnModelCreating(modelBuilder);
     }
