@@ -182,6 +182,8 @@ namespace TeachersRating.API.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DateCreated");
+
                     b.ToTable("UsersOnlineStats");
                 });
 
