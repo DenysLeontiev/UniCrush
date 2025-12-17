@@ -18,7 +18,7 @@ public class GetUsersOnlineStatByDays : IEndpoint
                                                       .AsNoTracking()
                                                       .ToListAsync();
 
-            var statsDto = stats.Select(x => x.ToDto());
+            var statsDto = stats.Select(x => x.ToDto()).ToList();
 
             return Results.Ok(statsDto);
         });
