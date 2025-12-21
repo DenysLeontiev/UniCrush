@@ -14,7 +14,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}            # IP address of your server
           key: ${{ secrets.SSH_KEY }}              # Private SSH key for SSH login to droplet
-          username: ${{ secrets.SSH_USERNAME }}    # SSH username (e.g., root)
+          username: ${{ secrets.SSH_USERNAME }}    # SSH username
           script: |
             echo "========== START DEPLOYMENT =========="
             echo "Initial working directory:"
