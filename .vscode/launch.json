@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/TeachersRating.API/bin/Debug/net9.0/TeachersRating.API.dll",
+            "program": "${workspaceFolder}/TeachersRating.API/bin/Debug/net10.0/TeachersRating.API.dll",
             "args": [],
             "cwd": "${workspaceFolder}/TeachersRating.API",
             "stopAtEntry": false,

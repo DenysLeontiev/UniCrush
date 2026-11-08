@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -36,7 +37,18 @@ builder.Services.AddCors(options =>
         });
 });
 
+// The API runs behind Nginx (and Cloudflare Tunnel), so trust X-Forwarded-* headers
+// to get the real scheme and client IP.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 await ApplyMigrationsAndSeedDataAsync(app.Services);
 
@@ -49,13 +61,8 @@ static async Task ApplyMigrationsAndSeedDataAsync(IServiceProvider services)
     {
         var context = scopedServices.GetRequiredService<AppDbContext>();
 
-        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-        var pendingMigrationsList = pendingMigrations.ToList();
-
-        if (pendingMigrationsList.Any())
-        {
-            await context.Database.MigrateAsync();
-        }
+        // MigrateAsync is a no-op when there is nothing pending.
+        await context.Database.MigrateAsync();
 
         await DataBaseSeeded.SeedDataAsync(context);
     }
@@ -88,7 +95,11 @@ app.UseCors("AllowAngularClient");
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+// In Docker, TLS is terminated by Cloudflare; the container only speaks HTTP.
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.MapHub<PresenceHub>("/hubs/online");
 

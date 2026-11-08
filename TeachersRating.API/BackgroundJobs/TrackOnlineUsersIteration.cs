@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using TeachersRating.API.Data;
-using TeachersRating.API.Data.Migrations;
 using TeachersRating.API.Interfaces;
 
 namespace TeachersRating.API.BackgroundJobs;

@@ -1,24 +1,72 @@
-# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+# Production stack for the home server (https://app.unicrush.online).
+#
+#   Internet -> Cloudflare -> cloudflared (runs separately on the VPS) -> host:8080 -> nginx -> client (Angular static files)
+#                                                                                         \-> api (/api, /hubs, /swagger) -> postgres
+#
+# All settings live in config files, no .env:
+#   - API:      TeachersRating.API/appsettings.json   (connection string, ClientUrl)
+#   - Angular:  TeachersRating.Client/src/environments/environment.ts
+#   - Nginx:    nginx/nginx.conf, host port below
+#   - Postgres: below
+# The Postgres password here must match the one in appsettings.json (and appsettings.Development.json).
+# See DEPLOY.md for the full setup.
+
+name: lecturersmash
 
 services:
-  teachersratingapi:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: teachersrating
+      POSTGRES_USER: teachersrating
+      POSTGRES_PASSWORD: 61ehanon
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Only reachable from the server itself (psql / backups / DB GUI over SSH).
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U teachersrating -d teachersrating"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
     image: teachersratingapi
     build:
       context: .
       dockerfile: TeachersRating.API/Dockerfile
-    ports:
-      - 5166:5166
+    restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/TeacherRatings.db
-      - ClientUrl=http://178.128.197.140:4200
-    volumes:
-      - /root/sqlite:/app/data
-    user: "1654:1654"  # Run as the same user that owns the DB files
-  teachersratingclient:
-    image:  teachersratingclient
-    build: 
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "5166"
+
+  client:
+    image: teachersratingclient
+    build:
       context: ./TeachersRating.Client
       dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
-      - 4200:80
+      # "<host port>:80" — the Cloudflare tunnel's public hostname app.unicrush.online points at this port
+      # (http://<VPS-IP>:8080, or http://localhost:8080 if cloudflared uses host networking).
+      - "8080:80"
+    depends_on:
+      - api
+      - client
+
+volumes:
+  pgdata:

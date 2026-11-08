@@ -13,7 +13,11 @@ public class GetUsersOnlineStatByDays : IEndpoint
     {
         app.Map("stats/days", async ([FromServices] AppDbContext context, [FromQuery] DateTime dateStart, [FromQuery] DateTime dateEnd) =>
         {
-            var stats = await context.UsersOnlineStats.Where(x => x.DateCreated >= dateStart && x.DateCreated <= dateEnd)
+            // Postgres 'timestamp with time zone' only accepts UTC DateTimes.
+            var start = ToUtc(dateStart);
+            var end = ToUtc(dateEnd);
+
+            var stats = await context.UsersOnlineStats.Where(x => x.DateCreated >= start && x.DateCreated <= end)
                                                       .OrderByDescending(x => x.DateCreated)
                                                       .AsNoTracking()
                                                       .ToListAsync();
@@ -23,4 +27,11 @@ public class GetUsersOnlineStatByDays : IEndpoint
             return Results.Ok(statsDto);
         });
     }
+
+    private static DateTime ToUtc(DateTime value) => value.Kind switch
+    {
+        DateTimeKind.Utc => value,
+        DateTimeKind.Local => value.ToUniversalTime(),
+        _ => DateTime.SpecifyKind(value, DateTimeKind.Utc),
+    };
 }

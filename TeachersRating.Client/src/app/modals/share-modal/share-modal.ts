@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { environment } from '../../../environments/environment.development';
 
 @Component({
   selector: 'app-share-modal',
@@ -16,7 +17,7 @@ export class ShareModal {
 
   public async shareContent(): Promise<void> {
     const shareData = {
-      text: 'Свапай та коментуй викладачів: https://nulp.online/home'
+      text: `Свапай та коментуй викладачів: ${environment.siteUrl}/home`
     };
 
     try {

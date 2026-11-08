@@ -20,7 +20,7 @@ public static class ServicesExtentions
             string connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new ArgumentNullException("DataBase Connection String is null");
 
-            options.UseSqlite(connectionString);
+            options.UseNpgsql(connectionString, npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 5));
         });
 
         return services;

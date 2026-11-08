@@ -1,9 +1,9 @@
-name: Build & Deploy
+name: Build & Deploy (legacy droplet)
 
+# Manual only: the app now runs on a home server behind a Cloudflare Tunnel (see DEPLOY.md),
+# which GitHub-hosted runners can't SSH into. Pushing to main no longer triggers a deploy.
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
