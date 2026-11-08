@@ -3,7 +3,7 @@
 Live at **https://app.unicrush.online**.
 
 ```
-Internet ──► Cloudflare ──► cloudflared ──────────► host:8080 ──► nginx ──► client   (Angular static files)
+Internet ──► Cloudflare ──► cloudflared ──────────► host:8081 ──► nginx ──► client   (Angular static files)
             (TLS, DNS)     (your own container,                       └───► api:5166 (/api, /hubs, /swagger) ──► postgres
                             separate from this repo)
 ```
@@ -16,7 +16,7 @@ it runs separately on the VPS with your token. The server needs no public IP and
 | `postgres` | Postgres 17, data in the `pgdata` Docker volume. Bound to `127.0.0.1:5432` only. |
 | `api`      | .NET 10 API. Applies EF migrations and seeds from `NulpScrapper/ouput.json` on first start. |
 | `client`   | Angular app served by its own small Nginx.                                    |
-| `nginx`    | Entry point on host port **8080**. Routes `/api/`, `/hubs/` (WebSockets), `/swagger` to the API, everything else to the client. |
+| `nginx`    | Entry point on host port **8081**. Routes `/api/`, `/hubs/` (WebSockets), `/swagger` to the API, everything else to the client. |
 
 ## Where the settings live
 
@@ -44,14 +44,14 @@ In **Zero Trust → Networks → Tunnels → (your tunnel) → Public Hostname �
 
 | Your cloudflared runs with… | Service URL |
 |---|---|
-| `network_mode: host` | `localhost:8080` |
-| a normal Docker network (default) | `<VPS LAN IP>:8080`, e.g. `192.168.1.50:8080` |
+| `network_mode: host` | `localhost:8081` |
+| a normal Docker network (default) | `<VPS LAN IP>:8081`, e.g. `192.168.1.50:8081` |
 
 Cloudflare creates the `app` DNS record automatically. WebSockets are on by default for tunnels — SignalR
 (`/hubs/online`) needs them.
 
 If the site gives a Cloudflare **502**, cloudflared can't reach that URL — check `docker logs <cloudflared-container>`
-and that `curl http://<VPS LAN IP>:8080` works on the VPS.
+and that `curl http://<VPS LAN IP>:8081` works on the VPS.
 
 ## 2. Run the app
 
@@ -68,7 +68,7 @@ First start: the API waits for Postgres to be healthy, creates the schema and se
 Check on the VPS:
 
 ```bash
-curl http://localhost:8080/api/institutes | head -c 300
+curl http://localhost:8081/api/institutes | head -c 300
 ```
 
 Then open https://app.unicrush.online.

@@ -1,6 +1,6 @@
 # Production stack for the home server (https://app.unicrush.online).
 #
-#   Internet -> Cloudflare -> cloudflared (runs separately on the VPS) -> host:8080 -> nginx -> client (Angular static files)
+#   Internet -> Cloudflare -> cloudflared (runs separately on the VPS) -> host:8081 -> nginx -> client (Angular static files)
 #                                                                                         \-> api (/api, /hubs, /swagger) -> postgres
 #
 # All settings live in config files, no .env:
@@ -62,8 +62,8 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       # "<host port>:80" — the Cloudflare tunnel's public hostname app.unicrush.online points at this port
-      # (http://<VPS-IP>:8080, or http://localhost:8080 if cloudflared uses host networking).
-      - "8080:80"
+      # (http://<VPS-IP>:8081, or http://localhost:8081 if cloudflared uses host networking).
+      - "8081:80"
     depends_on:
       - api
       - client
