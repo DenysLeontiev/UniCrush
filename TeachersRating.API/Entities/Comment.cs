@@ -4,6 +4,9 @@ public class Comment : BaseEntity
 {
     public string Content { get; set; } = "";
 
+    /// <summary>Optional display name the author typed (forum style). Null = anonymous.</summary>
+    public string? AuthorName { get; set; }
+
     public Guid WorkerId { get; set; }
     public Worker? Worker { get; set; } = null;
 

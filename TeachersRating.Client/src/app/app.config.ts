@@ -1,9 +1,41 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { fab } from '@fortawesome/free-brands-svg-icons';
+import {
+  faArrowLeft,
+  faArrowRight,
+  faArrowUpRightFromSquare,
+  faChevronRight,
+  faCircleExclamation,
+  faComment,
+  faComments,
+  faCopy,
+  faCrown,
+  faFaceFrownOpen,
+  faFire,
+  faHeart,
+  faHeartCrack,
+  faHouse,
+  faLink,
+  faMagnifyingGlass,
+  faMoon,
+  faPaperPlane,
+  faPlay,
+  faReply,
+  faRotateLeft,
+  faRotateRight,
+  faScaleBalanced,
+  faShareNodes,
+  faShuffle,
+  faSliders,
+  faSun,
+  faTrophy,
+  faUserSecret,
+  faWifi,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
+import { faTelegram } from '@fortawesome/free-brands-svg-icons';
 
 import { routes } from './app.routes';
 
@@ -11,13 +43,60 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withViewTransitions({
+        skipInitialTransition: true,
+        // A transition interrupted by another navigation is fine; don't report it as an error.
+        onViewTransitionCreated: ({ transition }) => {
+          transition.ready.catch(() => {});
+          transition.finished.catch(() => {});
+          transition.updateCallbackDone.catch(() => {});
+        },
+      }),
+      withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
+      withComponentInputBinding()
+    ),
     provideHttpClient(),
     {
       provide: FaIconLibrary,
       useFactory: () => {
         const library = new FaIconLibrary();
-        library.addIconPacks(fas, fab);
+        // Only the icons the app uses (keeps the bundle small).
+        library.addIcons(
+          faArrowLeft,
+          faArrowRight,
+          faArrowUpRightFromSquare,
+          faChevronRight,
+          faCircleExclamation,
+          faComment,
+          faComments,
+          faCopy,
+          faCrown,
+          faFaceFrownOpen,
+          faFire,
+          faHeart,
+          faHeartCrack,
+          faHouse,
+          faLink,
+          faMagnifyingGlass,
+          faMoon,
+          faPaperPlane,
+          faPlay,
+          faReply,
+          faRotateLeft,
+          faRotateRight,
+          faScaleBalanced,
+          faShareNodes,
+          faShuffle,
+          faSliders,
+          faSun,
+          faTrophy,
+          faUserSecret,
+          faWifi,
+          faXmark,
+          faTelegram,
+        );
         return library;
       }
     }

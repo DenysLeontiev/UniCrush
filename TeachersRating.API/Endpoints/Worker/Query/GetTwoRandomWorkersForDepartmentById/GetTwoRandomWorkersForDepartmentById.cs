@@ -12,34 +12,36 @@ public class GetTwoRandomWorkersForDepartmentById : IEndpoint
     {
         app.MapGet("/two-random-workers/{departmentId:guid}", async (Guid departmentId, [FromServices] AppDbContext context) =>
         {
-            var workersRecordsCount = await context.Workers.Where(x => x.Departments.Any(x => x.Id.Equals(departmentId)))
-                                                           .CountAsync();
+            var departmentWorkers = context.Workers
+                .Where(x => x.Departments.Any(d => d.Id == departmentId))
+                .OrderBy(x => x.Id);
 
-            Random random = new Random();
+            int workersRecordsCount = await departmentWorkers.CountAsync();
 
-            int firstOffset = random.Next(0, workersRecordsCount);
-            int secondOffset = random.Next(0, workersRecordsCount);
-
-            while (firstOffset == secondOffset)
+            if (workersRecordsCount < 2)
             {
-                secondOffset = random.Next(0, workersRecordsCount);
+                return Results.BadRequest("Department has fewer than two teachers.");
             }
 
-            var firstWorker = await context.Workers.Include(p => p.Photo)
-                                                    .Include(d => d.Departments)
-                                                    .Where(x => x.Departments.Any(x => x.Id.Equals(departmentId)))
-                                                    .Skip(firstOffset)
-                                                    .FirstAsync();
+            int firstOffset = Random.Shared.Next(0, workersRecordsCount);
+            int secondOffset = Random.Shared.Next(0, workersRecordsCount - 1);
 
-            var secondWorker = await context.Workers.Include(p => p.Photo)
-                                        .Include(d => d.Departments)
-                                        .Where(x => x.Departments.Any(x => x.Id.Equals(departmentId)))
-                                        .Skip(secondOffset)
-                                        .FirstAsync();
+            if (secondOffset >= firstOffset)
+            {
+                secondOffset++;
+            }
 
-            var workersArray = new[] { firstWorker, secondWorker };
+            var firstWorker = await departmentWorkers.Include(p => p.Photo)
+                                                     .Include(d => d.Departments)
+                                                     .Skip(firstOffset)
+                                                     .FirstAsync();
 
-            var mappedWorkersArray = workersArray.Select(w => w.ToDto());
+            var secondWorker = await departmentWorkers.Include(p => p.Photo)
+                                                      .Include(d => d.Departments)
+                                                      .Skip(secondOffset)
+                                                      .FirstAsync();
+
+            var mappedWorkersArray = new[] { firstWorker, secondWorker }.Select(w => w.ToDto());
 
             return Results.Ok(mappedWorkersArray);
         });

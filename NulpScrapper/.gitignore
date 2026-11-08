@@ -1,0 +1,8 @@
+# Dependencies / build output
+node_modules/
+dist/
+
+# Temp / ad-hoc scraper output (output.json is the committed seed)
+*.tmp
+ouput*.json
+*.log

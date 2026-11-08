@@ -6,7 +6,7 @@ using TeachersRating.API.BackgroundJobs;
 using TeachersRating.API.Data;
 using TeachersRating.API.Extensions;
 using TeachersRating.API.Hubs;
-using TeachersRating.API.Seed;
+using TeachersRating.API.Services.TeachersSync;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,7 +64,16 @@ static async Task ApplyMigrationsAndSeedDataAsync(IServiceProvider services)
         // MigrateAsync is a no-op when there is nothing pending.
         await context.Database.MigrateAsync();
 
-        await DataBaseSeeded.SeedDataAsync(context);
+        // Sync teachers from the newest NulpScrapper output (first run = initial seed).
+        // A failed sync must not take the site down, so it only logs.
+        try
+        {
+            await scopedServices.GetRequiredService<TeachersSyncService>().SyncAsync();
+        }
+        catch (Exception ex)
+        {
+            scopedServices.GetRequiredService<ILogger<Program>>().LogError(ex, "Teachers sync failed");
+        }
     }
     catch (Exception)
     {

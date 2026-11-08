@@ -1,0 +1,134 @@
+<div class="profile">
+
+  <header class="profile-nav">
+    <button type="button" class="icon-btn" (click)="back()" aria-label="Назад"><fa-icon icon="arrow-left"></fa-icon></button>
+    <span class="eyebrow">Профіль викладача</span>
+  </header>
+
+  @if (loading()) {
+    <section class="profile-head">
+      <div class="skeleton sk-circle sk-88"></div>
+      <div class="skeleton sk-line lg"></div>
+      <div class="skeleton sk-line short"></div>
+    </section>
+    <section class="stat-grid">
+      @for (i of [1, 2, 3, 4]; track i) { <div class="stat-card card"><div class="skeleton sk-line short"></div><div class="skeleton sk-line lg"></div></div> }
+    </section>
+  } @else if (notFound() || !profile()) {
+    <div class="empty card">
+      <fa-icon icon="face-frown-open" class="empty-icon"></fa-icon>
+      <p>Такого викладача не знайшли — можливо, його вже немає на сайті кафедри.</p>
+      <a class="btn btn-soft btn-sm" routerLink="/leaderboard">До рейтингу</a>
+    </div>
+  } @else {
+    @let p = profile()!;
+
+    <!-- Header -->
+    <section class="profile-head">
+      <app-avatar [src]="p.photoUrl" [name]="p.fullName" [size]="96" [ring]="p.crushDays > 0" />
+      <h1 class="profile-name">{{ p.fullName }}</h1>
+      @if (p.position) { <p class="profile-position">{{ p.position }}</p> }
+      <div class="profile-depts">
+        @for (d of p.departments; track d.id) {
+          <span class="tag" [title]="d.longName + ' · ' + (d.instituteName | instituteRename)">{{ d.shortName || d.longName }}</span>
+        }
+      </div>
+      @if (p.crushDays > 0) {
+        <p class="crush-badge"><fa-icon icon="crown"></fa-icon> {{ p.crushDays }} {{ plural(p.crushDays, 'раз', 'рази', 'разів') }} краш дня</p>
+      }
+    </section>
+
+    <!-- Main stats -->
+    <section class="stat-grid">
+      <div class="stat-card card">
+        <span class="stat-label"><fa-icon icon="heart" class="like"></fa-icon> Вподобання</span>
+        <span class="stat-value">{{ p.likes }}</span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-label"><fa-icon icon="heart-crack" class="dislike"></fa-icon> Дизлайки</span>
+        <span class="stat-value">{{ p.dislikes }}</span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-label"><fa-icon icon="scale-balanced"></fa-icon> Симпатія</span>
+        <span class="stat-value">{{ sympathy() === null ? '—' : sympathy() + '%' }}</span>
+        @if (sympathy() !== null) {
+          <span class="meter"><span class="meter-fill" [style.--pct.%]="sympathy()"></span></span>
+        }
+        <span class="stat-sub">{{ totalVotes() }} {{ plural(totalVotes(), 'голос', 'голоси', 'голосів') }}</span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-label"><fa-icon icon="comment"></fa-icon> Коментарі</span>
+        <span class="stat-value">{{ p.numberOfComments }}</span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-label"><fa-icon icon="trophy"></fa-icon> У рейтингу</span>
+        <span class="stat-value">#{{ p.rankOverall }}</span>
+        <span class="stat-sub">з {{ p.totalTeachers }}</span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-label"><fa-icon icon="house"></fa-icon> На кафедрі</span>
+        <span class="stat-value">{{ p.rankInDepartment ? '#' + p.rankInDepartment : '—' }}</span>
+        @if (rankDepartment(); as d) { <span class="stat-sub">з {{ p.departmentSize }} · {{ d.shortName || d.longName }}</span> }
+      </div>
+    </section>
+
+    <!-- Recent -->
+    <section class="recent card">
+      <div class="recent-row">
+        <span class="recent-label">Сьогодні</span>
+        <span class="recent-values">
+          <span class="like"><fa-icon icon="heart"></fa-icon> {{ p.likesToday }}</span>
+          <span class="dislike"><fa-icon icon="heart-crack"></fa-icon> {{ p.dislikesToday }}</span>
+        </span>
+      </div>
+      <div class="recent-row">
+        <span class="recent-label">За тиждень</span>
+        <span class="recent-values">
+          <span class="like"><fa-icon icon="heart"></fa-icon> {{ p.likesWeek }}</span>
+          <span class="dislike"><fa-icon icon="heart-crack"></fa-icon> {{ p.dislikesWeek }}</span>
+        </span>
+      </div>
+    </section>
+
+    <!-- 14-day activity -->
+    <section class="activity card">
+      <h2 class="section-heading">Активність за 14 днів</h2>
+      @if (hasActivity()) {
+        <div class="bars" role="img" aria-label="Голоси за останні 14 днів">
+          @for (b of bars(); track b.date) {
+            <div class="bar" [class.today]="b.isToday" [title]="b.title">
+              <span class="bar-stack">
+                <span class="bar-dislikes" [style.--h.%]="b.dislikesPct"></span>
+                <span class="bar-likes" [style.--h.%]="b.likesPct"></span>
+              </span>
+              <span class="bar-label">{{ b.label }}</span>
+            </div>
+          }
+        </div>
+        <div class="legend">
+          <span><span class="dot like-dot"></span> вподобання</span>
+          <span><span class="dot dislike-dot"></span> дизлайки</span>
+        </div>
+      } @else {
+        <p class="muted activity-empty">За останні два тижні голосів ще не було.</p>
+      }
+    </section>
+
+    <!-- Actions -->
+    <section class="profile-actions">
+      <button type="button" class="btn btn-primary btn-block" (click)="openComments()">
+        <fa-icon icon="comment"></fa-icon> Коментарі ({{ p.numberOfComments }})
+      </button>
+      @for (d of p.departments; track d.id) {
+        <button type="button" class="btn btn-block" (click)="swipeDepartment(d.id)">
+          <fa-icon icon="heart"></fa-icon> Свайпати {{ d.shortName || 'кафедру' }}
+        </button>
+      }
+      @if (p.personalPageUrl) {
+        <a class="btn btn-ghost btn-block" [href]="p.personalPageUrl" target="_blank" rel="noopener">
+          Сторінка на lpnu.ua <fa-icon icon="arrow-up-right-from-square"></fa-icon>
+        </a>
+      }
+    </section>
+  }
+</div>

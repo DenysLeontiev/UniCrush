@@ -1,13 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="utf-8">
-  <title>TeachersRatingClient</title>
+  <title>ЮніКраш — знайди свого краш-викладача</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="app-logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="ЮніКраш: свайпай викладачів Львівської політехніки, дивись рейтинг і краш дня, залишай анонімні коментарі.">
+  <meta name="theme-color" content="#FFFAF5">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:title" content="ЮніКраш">
+  <meta property="og:description" content="Знайди свого краш-викладача 💘">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="app-logo.png">
+  <link rel="apple-touch-icon" href="app-logo.png">
+
+  <!-- Apply the saved / system theme before first paint (no flash). -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('uc-theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var root = document.documentElement;
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        root.style.colorScheme = dark ? 'dark' : 'light';
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#15110F' : '#FFFAF5');
+      } catch (e) { }
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <app-root></app-root>

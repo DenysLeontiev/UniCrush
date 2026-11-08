@@ -20,5 +20,6 @@ RUN dotnet publish "TeachersRating.API.csproj" -c $configuration -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY ["NulpScrapper/ouput.json", "../NulpScrapper/ouput.json"]
+# Bundled teacher list (fallback when no fresh scrape exists in /app/scraper-data)
+COPY ["NulpScrapper/output.json", "../NulpScrapper/output.json"]
 ENTRYPOINT ["dotnet", "TeachersRating.API.dll"]

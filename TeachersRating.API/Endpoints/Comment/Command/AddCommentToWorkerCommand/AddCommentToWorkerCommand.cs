@@ -12,7 +12,32 @@ public class AddCommentToWorkerCommand : IEndpoint
     {
         app.MapPost("comments/{workerId:guid}", async ([FromRoute] Guid workerId, [FromBody] AddCommentDto addCommentDto, [FromServices] AppDbContext context) =>
         {
-            var worker = await context.Workers.Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id.Equals(workerId));
+            string content = addCommentDto.Content?.Trim() ?? string.Empty;
+
+            if (content.Length == 0)
+            {
+                return Results.BadRequest("Comment is empty.");
+            }
+
+            if (content.Length > 1000)
+            {
+                return Results.BadRequest("Comment is too long (max 1000 characters).");
+            }
+
+            // Forum-style optional name; whitespace-only -> anonymous.
+            string? authorName = string.Join(' ', (addCommentDto.AuthorName ?? string.Empty)
+                .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+
+            if (authorName.Length == 0)
+            {
+                authorName = null;
+            }
+            else if (authorName.Length > 40)
+            {
+                return Results.BadRequest("Name is too long (max 40 characters).");
+            }
+
+            var worker = await context.Workers.FirstOrDefaultAsync(x => x.Id.Equals(workerId));
 
             if (worker is null)
             {
@@ -30,7 +55,8 @@ public class AddCommentToWorkerCommand : IEndpoint
 
             var commentToAdd = new Entities.Comment
             {
-                Content = addCommentDto.Content,
+                Content = content,
+                AuthorName = authorName,
                 WorkerId = workerId,
                 ParentCommentId = addCommentDto.ParentCommentId,
             };

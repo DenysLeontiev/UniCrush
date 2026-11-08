@@ -144,6 +144,7 @@ public static class EntityMappingExtensions
         {
             Id = comment.Id,
             Content = comment.Content,
+            AuthorName = comment.AuthorName,
             DateCreated = comment.DateCreated.ToLocalTime(),
             DateModified = comment.DateModified.ToLocalTime(),
             WorkerId = comment.WorkerId,

@@ -1,15 +1,17 @@
 {
-  "name": "teachersrating",
+  "name": "nulp-scrapper",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "cls && npx tsc && node ./dist/index.js"
+    "build": "tsc",
+    "start": "tsc && node ./dist/index.js",
+    "scrape": "node ./dist/index.js"
   },
   "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Scrapes LPNU institutes, departments and staff into output.json (seed for the UniCrush API)",
   "devDependencies": {
     "@types/node": "^24.6.2",
     "typescript": "^5.9.3"

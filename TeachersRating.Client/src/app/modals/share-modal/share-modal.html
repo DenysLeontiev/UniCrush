@@ -1,10 +1,26 @@
-<div class="share-modal-container">
-  <div class="icon-wrapper">
-    <div class="share-icon">📤</div>
-  </div>
-  <h2>Зроби освіту кращою</h2>
-  <p class="subtitle">Поширюй з друзями та роби НУЛП кращим</p>
-  <button class="share-button" type="button" (click)="shareContent()">
-    Поширити
+<div class="uc-sheet-handle" aria-hidden="true"></div>
+
+<div class="share">
+  <div class="share-icon" aria-hidden="true"><fa-icon icon="share-nodes"></fa-icon></div>
+
+  <h2 class="display title">Поклич <em>своїх</em></h2>
+  <p class="sub">Чим більше голосів — тим чесніший рейтинг. Скинь одногрупникам.</p>
+
+  <button type="button" class="link-preview" (click)="copy()">
+    <span class="lp-icon"><fa-icon icon="link"></fa-icon></span>
+    <span class="lp-url">{{ displayUrl }}</span>
+    <span class="lp-copy"><fa-icon icon="copy"></fa-icon> Копіювати</span>
   </button>
+
+  <div class="actions">
+    @if (canNativeShare) {
+      <button type="button" class="btn btn-primary btn-block" (click)="share()">
+        <fa-icon icon="share-nodes"></fa-icon> Поділитися
+      </button>
+    }
+    <a class="btn btn-calm btn-block" [href]="telegramUrl" target="_blank" rel="noopener">
+      <fa-icon [icon]="['fab', 'telegram']"></fa-icon> У Telegram
+    </a>
+    <button type="button" class="btn btn-ghost btn-block" (click)="close()">Не зараз</button>
+  </div>
 </div>

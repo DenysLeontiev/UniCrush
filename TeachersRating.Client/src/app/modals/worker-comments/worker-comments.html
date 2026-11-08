@@ -1,118 +1,135 @@
-<div class="comments-container">
-    <header class="modal-header">
-        <h2>Коментарі</h2>
-    </header>
+<div class="uc-sheet-handle" aria-hidden="true"></div>
 
-    <div class="comment-input-section">
-        <textarea class="styled-input" placeholder="Пиши сюди..." rows="3" [(ngModel)]="newCommentText"
-            [disabled]="isSubmitting"></textarea>
-        <div class="input-actions">
-            <button class="btn-primary" (click)="onAddComment()" [disabled]="!newCommentText.trim() || isSubmitting">
-                {{ isSubmitting ? 'Додається...' : 'Додати коментар' }}
-            </button>
-        </div>
+<!-- Teacher header -->
+@if (data.teacher; as t) {
+  <header class="teacher">
+    <app-avatar [src]="t.photoUrl" [name]="t.fullName" [size]="60" [ring]="true" />
+    <div class="teacher-text">
+      <h2 class="teacher-name">{{ t.fullName }}</h2>
+      <p class="teacher-sub">{{ t.position }}@if (t.subtitle) { · {{ t.subtitle }} }</p>
+      <div class="teacher-stats">
+        @if (t.likes !== undefined) { <span class="stat like"><fa-icon icon="heart"></fa-icon> {{ t.likes }}</span> }
+        @if (t.dislikes !== undefined) { <span class="stat dislike"><fa-icon icon="heart-crack"></fa-icon> {{ t.dislikes }}</span> }
+        @if (data.showProfileLink !== false) {
+          <button type="button" class="stat link" (click)="openProfile()">
+            <fa-icon icon="trophy"></fa-icon> Статистика
+          </button>
+        }
+        @if (t.personalPageUrl) {
+          <a class="stat" [href]="t.personalPageUrl" target="_blank" rel="noopener">
+            lpnu.ua <fa-icon icon="arrow-up-right-from-square"></fa-icon>
+          </a>
+        }
+      </div>
     </div>
+    <button type="button" class="icon-btn close" (click)="close()" aria-label="Закрити"><fa-icon icon="xmark"></fa-icon></button>
+  </header>
+} @else {
+  <header class="teacher compact">
+    <h2 class="teacher-name">Коментарі</h2>
+    <button type="button" class="icon-btn close" (click)="close()" aria-label="Закрити"><fa-icon icon="xmark"></fa-icon></button>
+  </header>
+}
 
-    <div class="comments-list" (scroll)="onScroll($event)">
-        @let paginatedComments = (commentsService.commentsForWorker$ | async);
-        @for (comment of paginatedComments?.items; track comment.id || $index) {
-        <div class="comment-card" [class.replying]="replyingToCommentId === comment.id">
-            <div class="card-meta">
-                <span class="user-name">Користувач</span>
-                <span class="separator">•</span>
-                <span class="time">{{comment.dateCreated | ukrainianDate}}</span>
-            </div>
-            <div class="card-body">
-                {{comment.content}}
-            </div>
-            <div class="card-actions">
-                @if(comment.numberOfReplies > 0) {
-                <button class="btn-view-replies" 
-                        (click)="toggleReplies(comment.id)"
-                        [class.expanded]="isRepliesExpanded(comment.id)">
-                    <fa-icon [icon]="isRepliesExpanded(comment.id) ? 'chevron-up' : 'chevron-down'"></fa-icon>
-                    <span>{{comment.numberOfReplies}} {{ comment.numberOfReplies === 1 ? 'відповідь' : 'відповіді' }}</span>
-                </button>
-                }
-                <button class="btn-respond" 
-                        [class.active]="replyingToCommentId === comment.id"
-                        (click)="onRespondClick(comment.id)">
-                    {{ replyingToCommentId === comment.id ? 'Скасувати' : 'Відповісти' }}
-                </button>
-            </div>
-
-            @if(replyingToCommentId === comment.id) {
-            <div class="reply-section">
-                <div class="reply-header">
-                    <fa-icon icon="reply"></fa-icon>
-                    <span>Відповідь на коментар</span>
-                </div>
-                <textarea class="reply-input" 
-                          placeholder="Напишіть вашу відповідь..." 
-                          rows="2"
-                          [(ngModel)]="replyText"
-                          [disabled]="isSubmittingReply"></textarea>
-                <div class="reply-actions">
-                    <button class="btn-cancel" 
-                            (click)="cancelReply()"
-                            [disabled]="isSubmittingReply">
-                        Скасувати
-                    </button>
-                    <button class="btn-submit" 
-                            (click)="onSubmitReply(comment.id)"
-                            [disabled]="!replyText.trim() || isSubmittingReply">
-                        {{ isSubmittingReply ? 'Надсилання...' : 'Надіслати' }}
-                    </button>
-                </div>
-            </div>
-            }
-
-            @if(isRepliesExpanded(comment.id) && comment.numberOfReplies > 0) {
-            <div class="replies-container">
-                @let paginatedReplies = (commentsService.repliesForComment$ | async);
-                @if(paginatedReplies && paginatedReplies.items.length > 0) {
-                    @for(reply of paginatedReplies.items; track reply.id) {
-                    <div class="reply-card">
-                        <div class="reply-content">
-                            <div class="reply-meta">
-                                <span class="reply-user">Користувач</span>
-                                <span class="separator">•</span>
-                                <span class="reply-time">{{reply.dateCreated | ukrainianDate}}</span>
-                            </div>
-                            <div class="reply-body">
-                                {{reply.content}}
-                            </div>
-                        </div>
-                    </div>
-                    }
-                    
-                    @if(canLoadMoreReplies.get(comment.id)) {
-                    <div class="load-more-replies">
-                        <button class="btn-load-more" 
-                                (click)="loadMoreReplies(comment.id, $event)"
-                                [disabled]="isLoadingMoreReplies.get(comment.id)">
-                            {{ isLoadingMoreReplies.get(comment.id) ? 'Завантаження...' : 'Завантажити більше відповідей' }}
-                        </button>
-                    </div>
-                    }
-                }
-            </div>
-            }
-        </div>
-        }
-
-        @if(isLoadingMore) {
-        <div class="loading-indicator">
-            <p>Завантаження...</p>
-        </div>
-        }
-
-        @if(paginatedComments?.items?.length === 0 && !isLoadingMore) {
-        <div class="no-comments-wrapper">
-            <fa-icon icon="ban"></fa-icon>
-            <h3>Немає коментарів</h3>
-            <p>Станьте першим, хто залишить коментар!</p>
-        </div>
-        }
-    </div>
+<div class="section-title">
+  <span>{{ totalCount() }} {{ commentsWord(totalCount()) }}</span>
+  <span class="anon-note"><fa-icon icon="user-secret"></fa-icon> ім’я — за бажанням</span>
 </div>
+
+<!-- Comments -->
+<div class="list" (scroll)="onScroll($event)">
+  @if (loadingInitial()) {
+    @for (i of [1, 2, 3]; track i) {
+      <div class="comment">
+        <div class="skeleton sk-circle sk-36"></div>
+        <div class="sk-grow">
+          <div class="skeleton sk-line short"></div>
+          <div class="skeleton sk-line long"></div>
+          <div class="skeleton sk-line"></div>
+        </div>
+      </div>
+    }
+  } @else {
+    @for (comment of comments()?.items ?? []; track comment.id) {
+      <article class="comment" [class.replying]="replyTo()?.id === comment.id">
+        <span class="anon" [class.named]="!!comment.authorName">@if (comment.authorName) { {{ initials(comment) }} } @else { <fa-icon icon="user-secret"></fa-icon> }</span>
+        <div class="comment-main">
+          <div class="meta">
+            <span class="who" [class.anonymous]="!comment.authorName">{{ displayName(comment) }}</span>
+            <span class="when">{{ comment.dateCreated | timeAgo }}</span>
+          </div>
+          <p class="body">{{ comment.content }}</p>
+          <div class="actions">
+            <button type="button" class="link-btn" (click)="startReply(comment)">Відповісти</button>
+          </div>
+
+          @if (comment.numberOfReplies > 0) {
+            <button type="button" class="thread-toggle" (click)="toggleReplies(comment)">
+              <span class="thread-line"></span>
+              {{ expandedId() === comment.id ? 'Сховати відповіді' : 'Показати ' + comment.numberOfReplies + ' ' + repliesWord(comment.numberOfReplies) }}
+            </button>
+          }
+
+          @if (expandedId() === comment.id) {
+            <div class="replies">
+              @for (reply of replies()?.items ?? []; track reply.id) {
+                <article class="comment reply">
+                  <span class="anon small" [class.named]="!!reply.authorName">@if (reply.authorName) { {{ initials(reply) }} } @else { <fa-icon icon="user-secret"></fa-icon> }</span>
+                  <div class="comment-main">
+                    <div class="meta">
+                      <span class="who" [class.anonymous]="!reply.authorName">{{ displayName(reply) }}</span>
+                      <span class="when">{{ reply.dateCreated | timeAgo }}</span>
+                    </div>
+                    <p class="body">{{ reply.content }}</p>
+                  </div>
+                </article>
+              }
+              @if (repliesLoading()) {
+                <div class="mini-loader"><span class="spinner"></span></div>
+              } @else if (canLoadMoreReplies()) {
+                <button type="button" class="thread-toggle" (click)="loadMoreReplies(comment.id)">
+                  <span class="thread-line"></span> Ще відповіді
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </article>
+    } @empty {
+      <div class="empty">
+        <div class="empty-icon"><fa-icon icon="comments"></fa-icon></div>
+        <h3>Тут ще тихо</h3>
+        <p>Напиши перший коментар — анонімно.</p>
+      </div>
+    }
+
+    @if (loadingMore()) {
+      <div class="mini-loader"><span class="spinner"></span></div>
+    }
+  }
+</div>
+
+<!-- Composer -->
+<footer class="composer-wrap">
+  @if (replyTo(); as parent) {
+    <div class="replying-bar">
+      <fa-icon icon="reply"></fa-icon>
+      <span class="replying-text">Відповідь: «{{ parent.content }}»</span>
+      <button type="button" class="icon-btn tiny" (click)="cancelReply()" aria-label="Скасувати відповідь"><fa-icon icon="xmark"></fa-icon></button>
+    </div>
+  }
+  <div class="name-row">
+    <label for="comment-name">Ім’я</label>
+    <input id="comment-name" #nameInput type="text" class="name-input" autocomplete="nickname"
+      placeholder="Анонім" [maxLength]="nameMaxLength" [value]="authorName()" (input)="onNameInput(nameInput.value)" />
+  </div>
+  <div class="composer">
+    <textarea #composer rows="1" [maxLength]="maxLength"
+      [placeholder]="replyTo() ? 'Твоя відповідь…' : 'Додай коментар…'"
+      (input)="onInput(composer)" (keydown.control.enter)="send()" (keydown.meta.enter)="send()"
+      [disabled]="submitting()"></textarea>
+    <button type="button" class="send" [class.ready]="canSend()" [disabled]="!canSend()" (click)="send()" aria-label="Надіслати">
+      @if (submitting()) { <span class="spinner light"></span> } @else { <fa-icon icon="paper-plane"></fa-icon> }
+    </button>
+  </div>
+</footer>

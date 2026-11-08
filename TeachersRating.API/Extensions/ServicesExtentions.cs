@@ -8,6 +8,7 @@ using TeachersRating.API.BackgroundServices;
 using TeachersRating.API.Data;
 using TeachersRating.API.Interfaces;
 using TeachersRating.API.Services;
+using TeachersRating.API.Services.TeachersSync;
 
 namespace TeachersRating.API.Extensions;
 
@@ -21,6 +22,10 @@ public static class ServicesExtentions
                 ?? throw new ArgumentNullException("DataBase Connection String is null");
 
             options.UseNpgsql(connectionString, npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 5));
+
+            // Comments/votes of soft-deleted (hidden) teachers are meant to be hidden with them.
+            options.ConfigureWarnings(w => w.Ignore(
+                Microsoft.EntityFrameworkCore.Diagnostics.CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning));
         });
 
         return services;
@@ -43,6 +48,8 @@ public static class ServicesExtentions
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
         services.AddSingleton<IPresenceTrackerService, PresenceTrackerService>();
+        services.AddSingleton<AppCalendar>();
+        services.AddScoped<TeachersSyncService>();
 
         return services;
     }

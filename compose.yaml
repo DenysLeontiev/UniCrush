@@ -8,6 +8,7 @@
 #   - Angular:  TeachersRating.Client/src/environments/environment.ts
 #   - Nginx:    nginx/nginx.conf, host port below
 #   - Postgres: below
+#   - Teacher list refresh: ./update-teachers.sh (runs the `scraper` service, then restarts the API)
 # The Postgres password here must match the one in appsettings.json (and appsettings.Development.json).
 # See DEPLOY.md for the full setup.
 
@@ -40,6 +41,10 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      # Fresh teacher lists from the scraper (see `scraper` below). The newest of this and the
+      # list bundled in the image is synced into the DB on every API start.
+      - scraper-data:/app/scraper-data:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,5 +73,17 @@ services:
       - api
       - client
 
+  # One-off job, not started by `docker compose up`. Refresh the teacher list with:
+  #   ./update-teachers.sh
+  # (= docker compose run --rm --build scraper && docker compose restart api)
+  scraper:
+    image: unicrushscraper
+    build:
+      context: ./NulpScrapper
+    volumes:
+      - scraper-data:/data
+    profiles: ["tools"]
+
 volumes:
   pgdata:
+  scraper-data:

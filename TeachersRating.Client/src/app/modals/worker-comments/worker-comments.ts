@@ -1,225 +1,237 @@
-import { Component, inject, Inject, OnDestroy, OnInit, HostListener } from '@angular/core';
-import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { Component, ElementRef, OnDestroy, OnInit, computed, inject, signal, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommentsService } from '../../services/comments/comments.service';
+import { ToastService } from '../../services/toast/toast.service';
 import { CommentsQueryParams } from '../../models/queryParams/commentsQueryParams.model';
 import { CommentRepliesQueryParams } from '../../models/queryParams/commentRepliesQueryParams.model';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { AddComment } from '../../models/add-comment.model';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { UkrainianDatePipe } from '../../pipes/date/ukrainian-date-pipe';
+import { TeacherSummary } from '../../models/leaderboard.model';
+import { Comment } from '../../models/comment.model';
+import { Avatar } from '../../shared/avatar/avatar';
+import { TimeAgoPipe } from '../../pipes/time-ago/time-ago.pipe';
+
+export interface WorkerCommentsData {
+  workerId: string;
+  teacher?: TeacherSummary;
+  /** Show a link to the full stats page (off when opened from that page). */
+  showProfileLink?: boolean;
+}
+
+const MAX_LENGTH = 1000;
+const NAME_MAX_LENGTH = 40;
+const NAME_STORAGE_KEY = 'uc-comment-name';
 
 @Component({
   selector: 'app-worker-comments',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, UkrainianDatePipe],
-  templateUrl: './worker-comments.html',
-  styleUrl: './worker-comments.scss'
+  imports: [FontAwesomeModule, Avatar, TimeAgoPipe],
+  templateUrl: './worker-comments.html'
 })
 export class WorkerComments implements OnInit, OnDestroy {
+  readonly data = inject<WorkerCommentsData>(MAT_BOTTOM_SHEET_DATA);
+  private sheetRef = inject(MatBottomSheetRef<WorkerComments>);
+  readonly commentsService = inject(CommentsService);
+  private toast = inject(ToastService);
+  private router = inject(Router);
 
-  public commentsService = inject(CommentsService);
-  public newCommentText: string = '';
-  public isSubmitting: boolean = false;
-  public isLoadingMore: boolean = false;
-  public replyingToCommentId: string | null = null;
-  public replyText: string = '';
-  public isSubmittingReply: boolean = false;
-  public expandedCommentIds: Set<string> = new Set();
-  public repliesQueryParams: Map<string, CommentRepliesQueryParams> = new Map();
-  public canLoadMoreReplies: Map<string, boolean> = new Map();
-  public isLoadingMoreReplies: Map<string, boolean> = new Map();
+  readonly composer = viewChild<ElementRef<HTMLTextAreaElement>>('composer');
 
-  private commentsQueryParams: CommentsQueryParams = new CommentsQueryParams();
-  private canLoadMore: boolean = true;
+  readonly comments = toSignal(this.commentsService.commentsForWorker$, { initialValue: null });
+  readonly replies = toSignal(this.commentsService.repliesForComment$, { initialValue: null });
 
-  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any) { }
+  readonly text = signal('');
+  readonly submitting = signal(false);
+  readonly loadingInitial = signal(true);
+  readonly loadingMore = signal(false);
+  readonly replyTo = signal<Comment | null>(null);
+  readonly expandedId = signal<string | null>(null);
+  readonly repliesLoading = signal(false);
+  readonly maxLength = MAX_LENGTH;
+  readonly nameMaxLength = NAME_MAX_LENGTH;
+
+  /** Forum-style signature: optional, remembered between visits. Empty = "Анонім". */
+  readonly authorName = signal(this.readSavedName());
+
+  readonly canSend = computed(() => this.text().trim().length > 0 && !this.submitting());
+  readonly totalCount = computed(() => this.comments()?.totalCount ?? 0);
+
+  private queryParams = new CommentsQueryParams();
+  private repliesParams = new CommentRepliesQueryParams();
 
   ngOnInit(): void {
-    this.loadComments();
+    this.commentsService.clearComments();
+    this.commentsService.clearReplies();
+    this.commentsService.getPaginatedComments(this.data.workerId, this.queryParams).subscribe({
+      next: () => this.loadingInitial.set(false),
+      error: () => this.loadingInitial.set(false),
+    });
   }
-  
+
   ngOnDestroy(): void {
     this.commentsService.clearComments();
     this.commentsService.clearReplies();
   }
 
-  @HostListener('scroll', ['$event'])
-  onScroll(event: any): void {
-    const element = event.target;
-    const threshold = 100;
-    const position = element.scrollTop + element.offsetHeight;
-    const height = element.scrollHeight;
-
-    if (position > height - threshold && !this.isLoadingMore && this.canLoadMore) {
-      this.loadMoreComments();
-    }
+  close(): void {
+    this.sheetRef.dismiss();
   }
 
-  private loadComments(): void {
-    const workerId: string = this.data.workerId;
-    this.commentsService.getPaginatedComments(workerId, this.commentsQueryParams).subscribe({
-      next: (response) => {
-        console.log(response);
-        this.updatePaginationState(response);
+  openProfile(): void {
+    this.sheetRef.dismiss();
+    this.router.navigate(['/teacher', this.data.workerId]);
+  }
+
+  onScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollTop + el.clientHeight < el.scrollHeight - 160) return;
+
+    const current = this.comments();
+    if (!current || this.loadingMore() || current.pageNumber >= current.totalPages) return;
+
+    this.loadingMore.set(true);
+    this.queryParams.pageNumber++;
+    this.commentsService.getPaginatedComments(this.data.workerId, this.queryParams).subscribe({
+      next: () => this.loadingMore.set(false),
+      error: () => {
+        this.queryParams.pageNumber--;
+        this.loadingMore.set(false);
       },
-      error: (error) => {
-        console.log(error);
-      }
     });
   }
 
-  private loadMoreComments(): void {
-    const currentComments = this.commentsService.getCurrentComments();
-    
-    if (!currentComments || currentComments.pageNumber >= currentComments.totalPages) {
-      this.canLoadMore = false;
-      return;
-    }
+  onInput(el: HTMLTextAreaElement): void {
+    this.text.set(el.value);
+    // auto-grow
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
+  }
 
-    this.isLoadingMore = true;
-    this.commentsQueryParams.pageNumber++;
-    
-    const workerId: string = this.data.workerId;
-    this.commentsService.getPaginatedComments(workerId, this.commentsQueryParams).subscribe({
-      next: (response) => {
-        console.log('Loaded more comments:', response);
-        this.updatePaginationState(response);
-        this.isLoadingMore = false;
+  startReply(comment: Comment): void {
+    this.replyTo.set(comment);
+    this.composer()?.nativeElement.focus();
+  }
+
+  cancelReply(): void {
+    this.replyTo.set(null);
+  }
+
+  send(): void {
+    if (!this.canSend()) return;
+
+    const parent = this.replyTo();
+    const content = this.text().trim().slice(0, MAX_LENGTH);
+    this.submitting.set(true);
+
+    const authorName = this.authorName().replace(/\s+/g, ' ').trim().slice(0, NAME_MAX_LENGTH) || null;
+    this.authorName.set(authorName ?? '');
+    this.saveName(authorName ?? '');
+
+    this.commentsService.addComment(this.data.workerId, { content, authorName, parentCommentId: parent?.id }).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.text.set('');
+        const el = this.composer()?.nativeElement;
+        if (el) {
+          el.value = '';
+          el.style.height = 'auto';
+        }
+        this.replyTo.set(null);
+        navigator.vibrate?.(8);
+
+        if (parent) {
+          // Show the thread we just replied to, freshly loaded.
+          this.openReplies(parent.id, true);
+        }
       },
-      error: (error) => {
-        console.error('Failed to load more comments:', error);
-        this.isLoadingMore = false;
-        this.commentsQueryParams.pageNumber--;
-      }
+      error: () => {
+        this.submitting.set(false);
+        this.toast.show('Не вдалося надіслати. Спробуй ще раз.');
+      },
     });
   }
 
-  private updatePaginationState(response: any): void {
-    this.canLoadMore = response.pageNumber < response.totalPages;
-  }
-
-  public onAddComment(): void {
-    if (!this.newCommentText.trim() || this.isSubmitting) {
-      return;
-    }
-
-    this.isSubmitting = true;
-    const workerId: string = this.data.workerId;
-    const addComment: AddComment = {
-      content: this.newCommentText.trim()
-    };
-
-    this.commentsService.addComment(workerId, addComment).subscribe({
-      next: (comment) => {
-        console.log('Comment added:', comment);
-        this.newCommentText = '';
-        this.isSubmitting = false;
-      },
-      error: (error) => {
-        console.error('Failed to add comment:', error);
-        this.isSubmitting = false;
-      }
-    });
-  }
-
-  public onRespondClick(commentId: string): void {
-    if (this.replyingToCommentId === commentId) {
-      this.cancelReply();
-    } else {
-      this.replyingToCommentId = commentId;
-      this.replyText = '';
-    }
-  }
-
-  public cancelReply(): void {
-    this.replyingToCommentId = null;
-    this.replyText = '';
-    this.isSubmittingReply = false;
-  }
-
-  public onSubmitReply(commentId: string): void {
-    if (!this.replyText.trim() || this.isSubmittingReply) {
-      return;
-    }
-
-    this.isSubmittingReply = true;
-    const workerId: string = this.data.workerId;
-    const addReply: AddComment = {
-      content: this.replyText.trim(),
-      parentCommentId: commentId
-    };
-
-    this.commentsService.addComment(workerId, addReply).subscribe({
-      next: (reply) => {
-        console.log('Reply added:', reply);
-        this.replyText = '';
-        this.isSubmittingReply = false;
-        this.cancelReply();
-      },
-      error: (error) => {
-        console.error('Failed to add reply:', error);
-        this.isSubmittingReply = false;
-      }
-    });
-  }
-
-  public toggleReplies(commentId: string): void {
-    if (this.expandedCommentIds.has(commentId)) {
-      // Collapse replies
-      this.expandedCommentIds.delete(commentId);
+  toggleReplies(comment: Comment): void {
+    if (this.expandedId() === comment.id) {
+      this.expandedId.set(null);
       this.commentsService.clearReplies();
-    } else {
-      // Expand and load replies
-      this.expandedCommentIds.add(commentId);
-      this.loadReplies(commentId);
-    }
-  }
-
-  private loadReplies(commentId: string): void {
-    if (!this.repliesQueryParams.has(commentId)) {
-      this.repliesQueryParams.set(commentId, new CommentRepliesQueryParams());
-    }
-
-    const queryParams = this.repliesQueryParams.get(commentId)!;
-    this.commentsService.getPaginatedReplies(commentId, queryParams).subscribe({
-      next: (response) => {
-        console.log('Replies loaded:', response);
-        this.canLoadMoreReplies.set(commentId, response.pageNumber < response.totalPages);
-      },
-      error: (error) => {
-        console.error('Failed to load replies:', error);
-      }
-    });
-  }
-
-  public loadMoreReplies(commentId: string, event: Event): void {
-    event.stopPropagation();
-    
-    if (this.isLoadingMoreReplies.get(commentId)) {
       return;
     }
+    this.openReplies(comment.id, false);
+  }
 
-    const queryParams = this.repliesQueryParams.get(commentId);
-    if (!queryParams) return;
+  private openReplies(commentId: string, force: boolean): void {
+    if (this.expandedId() === commentId && !force) return;
 
-    this.isLoadingMoreReplies.set(commentId, true);
-    queryParams.pageNumber++;
-
-    this.commentsService.getPaginatedReplies(commentId, queryParams).subscribe({
-      next: (response) => {
-        console.log('More replies loaded:', response);
-        this.canLoadMoreReplies.set(commentId, response.pageNumber < response.totalPages);
-        this.isLoadingMoreReplies.set(commentId, false);
-      },
-      error: (error) => {
-        console.error('Failed to load more replies:', error);
-        queryParams.pageNumber--;
-        this.isLoadingMoreReplies.set(commentId, false);
-      }
+    this.expandedId.set(commentId);
+    this.commentsService.clearReplies();
+    this.repliesParams = new CommentRepliesQueryParams();
+    this.repliesLoading.set(true);
+    this.commentsService.getPaginatedReplies(commentId, this.repliesParams).subscribe({
+      next: () => this.repliesLoading.set(false),
+      error: () => this.repliesLoading.set(false),
     });
   }
 
-  public isRepliesExpanded(commentId: string): boolean {
-    return this.expandedCommentIds.has(commentId);
+  onNameInput(value: string): void {
+    this.authorName.set(value);
+  }
+
+  displayName(comment: Comment): string {
+    return comment.authorName?.trim() || 'Анонім';
+  }
+
+  initials(comment: Comment): string {
+    const words = (comment.authorName ?? '').trim().split(/\s+/).filter(Boolean);
+    return words.slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  }
+
+  private readSavedName(): string {
+    try {
+      return localStorage.getItem(NAME_STORAGE_KEY) ?? '';
+    } catch {
+      return '';
+    }
+  }
+
+  private saveName(name: string): void {
+    try {
+      if (name) localStorage.setItem(NAME_STORAGE_KEY, name);
+      else localStorage.removeItem(NAME_STORAGE_KEY);
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  canLoadMoreReplies(): boolean {
+    const r = this.replies();
+    return !!r && r.pageNumber < r.totalPages;
+  }
+
+  loadMoreReplies(commentId: string): void {
+    if (this.repliesLoading()) return;
+    this.repliesLoading.set(true);
+    this.repliesParams.pageNumber++;
+    this.commentsService.getPaginatedReplies(commentId, this.repliesParams).subscribe({
+      next: () => this.repliesLoading.set(false),
+      error: () => {
+        this.repliesParams.pageNumber--;
+        this.repliesLoading.set(false);
+      },
+    });
+  }
+
+  repliesWord(n: number): string {
+    const mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return 'відповідь';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'відповіді';
+    return 'відповідей';
+  }
+
+  commentsWord(n: number): string {
+    const mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return 'коментар';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'коментарі';
+    return 'коментарів';
   }
 }

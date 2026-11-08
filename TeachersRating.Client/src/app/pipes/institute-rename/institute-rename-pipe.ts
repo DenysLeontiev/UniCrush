@@ -1,15 +1,22 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
+/**
+ * lpnu.ua lists institutes as "Архітектури та дизайну інститут" (and sometimes without the word).
+ * Turn both into "Інститут архітектури та дизайну", keeping the rest of the casing (proper names).
+ */
 @Pipe({
   name: 'instituteRename'
 })
 export class InstituteRenamePipe implements PipeTransform {
-  transform(value: string): string {
-    const words: string[] = value.trim().split(/\s+/);
-    let output: string = words[words.length - 1].charAt(0).toUpperCase() + words[words.length - 1].slice(1) + " ";
-    for(let i = 0; i < words.length - 1; i++){
-      output += words[i].toLocaleLowerCase() + " ";
+  transform(value: string | null | undefined): string {
+    const name = (value ?? '').trim().replace(/\s+/g, ' ');
+    if (!name) return '';
+
+    if (/^інститут\s/i.test(name)) {
+      return name.charAt(0).toUpperCase() + name.slice(1);
     }
-    return output;
+
+    const rest = name.replace(/\s*інститут$/i, '');
+    return `Інститут ${rest.charAt(0).toLowerCase()}${rest.slice(1)}`;
   }
 }

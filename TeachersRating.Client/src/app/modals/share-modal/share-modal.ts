@@ -1,39 +1,47 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { environment } from '../../../environments/environment.development';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
   selector: 'app-share-modal',
-  imports: [],
-  templateUrl: './share-modal.html',
-  styleUrl: './share-modal.scss'
+  imports: [FontAwesomeModule],
+  templateUrl: './share-modal.html'
 })
 export class ShareModal {
+  private sheetRef = inject(MatBottomSheetRef<ShareModal>);
+  private toast = inject(ToastService);
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialogRef: MatDialogRef<ShareModal>
-  ) {}
+  readonly url = `${environment.siteUrl}/home`;
+  readonly displayUrl = this.url.replace(/^https?:\/\//, '');
+  readonly text = 'ЮніКраш — свайпай викладачів політехніки, дивись краш дня і пиши анонімні коментарі 💘';
+  readonly canNativeShare = typeof navigator.share === 'function';
 
-  public async shareContent(): Promise<void> {
-    const shareData = {
-      text: `Свапай та коментуй викладачів: ${environment.siteUrl}/home`
-    };
+  readonly telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(this.url)}&text=${encodeURIComponent(this.text)}`;
 
+  async share(): Promise<void> {
     try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        this.dialogRef.close();
-      } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(shareData.text);
-        alert('Посилання скопійовано в буфер обміну!');
-        this.dialogRef.close();
-      }
+      await navigator.share({ title: 'ЮніКраш', text: this.text, url: this.url });
+      this.sheetRef.dismiss();
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
-        console.error('Error sharing:', error);
+        await this.copy();
       }
     }
+  }
+
+  async copy(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(this.url);
+      this.toast.show('Посилання скопійовано ✨');
+      this.sheetRef.dismiss();
+    } catch {
+      this.toast.show(this.url, 4000);
+    }
+  }
+
+  close(): void {
+    this.sheetRef.dismiss();
   }
 }

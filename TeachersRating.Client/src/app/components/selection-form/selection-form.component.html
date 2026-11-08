@@ -1,69 +1,118 @@
-<div class="page-header">
-  <h2 class="page-title">Свайпай викладачів</h2>
-  <p class="page-subtitle">Та залишай коментарі</p>
+<div class="home">
 
-  <div class="info-wrapper">
-    <button class="share-button" (click)="openShareModal()">
-      <span class="share-icon">📤</span>
-      <span>Поділитися</span>
-    </button>
+  <!-- Hero -->
+  <section class="hero">
+    <span class="eyebrow">Львівська політехніка</span>
+    <h1 class="display hero-title">Знайди свого <em>краш</em>&#8209;викладача</h1>
+    <p class="hero-sub">Обирай з двох, дивись, хто в топі, і анонімно пиши, що думаєш.</p>
+  </section>
 
-    <a href="https://t.me/nulp_support" target="_blank" class="support-link">
-      <svg class="telegram-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.52-.47-.02-1.38-.27-2.05-.49-.82-.27-1.48-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.66-2.89 8-3.45 3.8-1.61 4.6-1.89 5.12-1.9.11 0 .37.03.53.16.14.11.17.26.19.37.01.08.03.29.01.45z"
-          fill="currentColor" />
-      </svg>
-      <span>Підтримка</span>
+  <!-- Краш дня (story card) -->
+  <section class="crush card" [class.clickable]="!!crush()?.worker" (click)="openCrush()">
+    @if (crushLoading()) {
+      <div class="crush-row">
+        <div class="skeleton sk-circle sk-64"></div>
+        <div class="crush-text">
+          <div class="skeleton sk-line short"></div>
+          <div class="skeleton sk-line lg"></div>
+          <div class="skeleton sk-line"></div>
+        </div>
+      </div>
+    } @else if (crush()?.worker; as worker) {
+      <div class="crush-row">
+        <app-avatar [src]="worker.photoUrl" [name]="worker.fullName" [size]="64" [ring]="true" />
+        <div class="crush-text">
+          <span class="crush-label"><fa-icon icon="fire"></fa-icon> Краш дня</span>
+          <h2 class="crush-name">{{ worker.fullName }}</h2>
+          <p class="crush-meta">
+            <span class="crush-likes"><fa-icon icon="heart"></fa-icon> {{ worker.likes }} {{ likesWord(worker.likes) }} сьогодні</span>
+          </p>
+        </div>
+        <fa-icon icon="chevron-right" class="crush-chevron"></fa-icon>
+      </div>
+    } @else {
+      <div class="crush-row">
+        <div class="crush-empty-icon"><fa-icon icon="heart-crack"></fa-icon></div>
+        <div class="crush-text">
+          <span class="crush-label"><fa-icon icon="fire"></fa-icon> Краш дня</span>
+          <h2 class="crush-name">Ще вільне місце</h2>
+          <p class="crush-meta muted">Сьогодні ще ніхто не обрав. Стань першим 💘</p>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Continue -->
+  @if (selection.last(); as last) {
+    <a class="continue card" [routerLink]="['/comparison', last.departmentId]">
+      <span class="continue-icon"><fa-icon icon="play"></fa-icon></span>
+      <span class="continue-text">
+        <span class="continue-label">Продовжити свайпати</span>
+        <span class="continue-dept">{{ last.departmentName }}</span>
+      </span>
+      <fa-icon icon="chevron-right" class="muted"></fa-icon>
     </a>
-  </div>
-</div>
+  }
 
-<div class="selection-container">
-  <div class="selection-form">
-    <a routerLink="/top-workers" class="top-workers-link">
-      <button type="button" class="top-workers-btn">
-        <b>Топ Викладачів</b>
-      </button>
-    </a>
-
-    <h3>Оберіть Інститут та Кафедру</h3>
+  <!-- Picker -->
+  <section class="picker card" id="pick">
+    <div class="picker-head">
+      <h2 class="display picker-title">Обери кафедру</h2>
+      <p class="muted">Ми покажемо двох викладачів — тапни на того, хто тобі більше до вподоби.</p>
+    </div>
 
     @if (error()) {
-    <div class="error-message">
-      {{ error() }}
-    </div>
+      <div class="error" role="alert"><fa-icon icon="circle-exclamation"></fa-icon> {{ error() }}</div>
     }
 
-    <div class="form-group">
-      <label for="institute">Інститут:</label>
-      <select id="institute" [value]="selectedInstituteId()" (change)="onInstituteChange($event)"
-        [disabled]="isLoading()" class="form-select">
-        <option value="">Оберіть Інститут...</option>
-        @for (institute of institutes(); track institute.id) {
-        <option [value]="institute.id">{{ institute.name | instituteRename }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="department">Кафедра:</label>
-      <select id="department" [value]="selectedDepartmentId()" (change)="onDepartmentChange($event)"
-        [disabled]="isLoading() || !selectedInstituteId()" class="form-select">
-        <option value="">Оберіть Кафедру...</option>
-        @for (department of departments(); track department.id) {
-        <option [value]="department.id">{{ department.longName }}</option>
-        }
-      </select>
-    </div>
-
-    <button class="start-btn" (click)="startComparison()" [disabled]="!canStartComparison()">
-      @if (isLoading()) {
-      <span class="spinner"></span>
-      Завантаження...
+    <div class="field">
+      <label for="institute">Інститут</label>
+      @if (institutesLoading()) {
+        <div class="skeleton sk-field"></div>
       } @else {
-      Почати порівнювати
+        <select id="institute" class="select" [value]="selectedInstituteId()" (change)="onInstituteChange($event)">
+          <option value="">Обери інститут…</option>
+          @for (institute of institutes(); track institute.id) {
+            <option [value]="institute.id" [selected]="institute.id === selectedInstituteId()">{{ institute.name | instituteRename }}</option>
+          }
+        </select>
       }
+    </div>
+
+    <div class="field" [class.disabled]="!selectedInstituteId()">
+      <label for="department">Кафедра</label>
+      <select id="department" class="select" [value]="selectedDepartmentId()" (change)="onDepartmentChange($event)"
+        [disabled]="!selectedInstituteId() || departmentsLoading()">
+        <option value="">{{ departmentsLoading() ? 'Завантаження…' : 'Обери кафедру…' }}</option>
+        @for (department of departments(); track department.id) {
+          <option [value]="department.id" [selected]="department.id === selectedDepartmentId()">{{ department.longName }}</option>
+        }
+      </select>
+    </div>
+
+    <button class="btn btn-primary btn-block start" type="button" (click)="startComparison()" [disabled]="!canStart()">
+      Почати свайпати <fa-icon icon="arrow-right"></fa-icon>
     </button>
-  </div>
+  </section>
+
+  <!-- Quick actions -->
+  <section class="quick">
+    <a class="quick-item card" routerLink="/leaderboard">
+      <span class="quick-icon apricot"><fa-icon icon="trophy"></fa-icon></span>
+      <span class="quick-title">Рейтинг</span>
+      <span class="quick-sub">Хто в топі</span>
+    </a>
+    <button class="quick-item card" type="button" (click)="sheets.openShare()">
+      <span class="quick-icon aqua"><fa-icon icon="share-nodes"></fa-icon></span>
+      <span class="quick-title">Поділитися</span>
+      <span class="quick-sub">З одногрупниками</span>
+    </button>
+    <a class="quick-item card" href="https://t.me/nulp_support" target="_blank" rel="noopener">
+      <span class="quick-icon cream"><fa-icon [icon]="['fab', 'telegram']"></fa-icon></span>
+      <span class="quick-title">Підтримка</span>
+      <span class="quick-sub">Telegram</span>
+    </a>
+  </section>
+
+  <p class="footnote muted">Коментарі анонімні. Будь чемним — за ними теж люди.</p>
 </div>

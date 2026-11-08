@@ -1,20 +1,21 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { PresenceService } from './services/presence/presence.service';
-import { provideNativeDateAdapter } from '@angular/material/core';
-
+import { ThemeService } from './services/theme/theme.service';
+import { SelectionStore } from './services/selection/selection.store';
+import { ToastService } from './services/toast/toast.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FontAwesomeModule],
-  providers: [provideNativeDateAdapter()],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, FontAwesomeModule],
+  templateUrl: './app.html'
 })
 export class App implements OnInit, OnDestroy {
-
   private presenceService = inject(PresenceService);
+  readonly theme = inject(ThemeService);
+  readonly selection = inject(SelectionStore);
+  readonly toast = inject(ToastService);
 
   async ngOnInit(): Promise<void> {
     await this.presenceService.startConection();

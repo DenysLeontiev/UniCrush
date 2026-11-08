@@ -1,0 +1,180 @@
+<div class="lb">
+
+  <header class="lb-head">
+    <span class="eyebrow">Рейтинг</span>
+    <h1 class="display lb-title">Краш <em>дня</em></h1>
+  </header>
+
+  <!-- Краш дня -->
+  <section class="crush-hero" [class.empty]="!crushLoading() && !crush()?.worker">
+    @if (crushLoading()) {
+      <div class="hero-inner">
+        <div class="skeleton sk-circle sk-88"></div>
+        <div class="skeleton sk-line lg"></div>
+        <div class="skeleton sk-line short"></div>
+      </div>
+    } @else if (crush()?.worker; as worker) {
+      <a class="hero-inner clickable" [routerLink]="['/teacher', worker.id]">
+        <span class="hero-badge"><fa-icon icon="crown"></fa-icon> {{ todayLabel }}{{ placeLabel() ? ' · ' + placeLabel() : '' }}</span>
+        <app-avatar [src]="worker.photoUrl" [name]="worker.fullName" [size]="88" [ring]="true" />
+        <h2 class="hero-name">{{ worker.fullName }}</h2>
+        <p class="hero-dept">{{ departmentsLabel(worker) }}</p>
+        <div class="hero-stats">
+          <span><fa-icon icon="heart"></fa-icon> {{ worker.likes }} сьогодні</span>
+          <span class="dot">·</span>
+          <span class="muted">усього ❤ сьогодні: {{ crush()!.totalLikesToday }}</span>
+        </div>
+      </a>
+    } @else {
+      <div class="hero-inner">
+        <span class="hero-badge"><fa-icon icon="crown"></fa-icon> {{ todayLabel }}{{ placeLabel() ? ' · ' + placeLabel() : '' }}</span>
+        <div class="hero-empty"><fa-icon icon="heart"></fa-icon></div>
+        <h2 class="hero-name">Корона ще вільна</h2>
+        <p class="hero-dept">Сьогодні ще ніхто не отримав жодного ❤</p>
+      </div>
+    }
+  </section>
+
+  <!-- Sticky toolbar -->
+  <div class="toolbar">
+    <div class="search">
+      <fa-icon icon="magnifying-glass" class="search-icon"></fa-icon>
+      <input #searchInput class="search-input" type="search" inputmode="search" placeholder="Пошук викладача"
+        autocomplete="off" enterkeyhint="search" [value]="search()" (input)="onSearch(searchInput.value)" />
+      @if (search()) {
+        <button type="button" class="search-clear" (click)="clearSearch(searchInput)" aria-label="Очистити пошук">
+          <fa-icon icon="xmark"></fa-icon>
+        </button>
+      }
+    </div>
+
+    <div class="segmented" role="tablist" aria-label="Період">
+      @for (p of periods; track p.value) {
+        <button type="button" role="tab" class="seg" [class.active]="period() === p.value"
+          [attr.aria-selected]="period() === p.value" (click)="setPeriod(p.value)">{{ p.label }}</button>
+      }
+      <span class="seg-pill" [style.--i]="period() === 'today' ? 0 : period() === 'week' ? 1 : 2"></span>
+    </div>
+
+    <div class="chips">
+      <button type="button" class="chip filter-chip" [class.active]="filtersOpen() || activeFilterCount() > 0"
+        (click)="filtersOpen.set(!filtersOpen())" [attr.aria-expanded]="filtersOpen()">
+        <fa-icon icon="sliders"></fa-icon> Фільтри
+        @if (activeFilterCount() > 0) { <span class="chip-badge">{{ activeFilterCount() }}</span> }
+      </button>
+      @for (s of sorts; track s.value) {
+        <button type="button" class="chip" [class.active]="sort() === s.value" (click)="setSort(s.value)">{{ s.label }}</button>
+      }
+    </div>
+  </div>
+
+  <!-- Filters panel -->
+  <div class="filters" [class.open]="filtersOpen()">
+    <div class="filters-inner">
+      <div class="filters-card card">
+        <div class="field">
+          <label for="lb-institute">Інститут</label>
+          <select id="lb-institute" class="select" (change)="onInstituteChange($event)">
+            <option value="" [selected]="!instituteId()">Усі інститути</option>
+            @for (inst of institutes(); track inst.id) {
+              <option [value]="inst.id" [selected]="inst.id === instituteId()">{{ inst.name | instituteRename }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="lb-department">Кафедра</label>
+          <select id="lb-department" class="select" (change)="onDepartmentChange($event)" [disabled]="!instituteId()">
+            <option value="" [selected]="!departmentId()">{{ instituteId() ? 'Усі кафедри' : 'Спершу обери інститут' }}</option>
+            @for (dep of departments(); track dep.id) {
+              <option [value]="dep.id" [selected]="dep.id === departmentId()">{{ dep.longName }}</option>
+            }
+          </select>
+        </div>
+        @if (activeFilterCount() > 0) {
+          <button type="button" class="btn btn-ghost btn-sm reset" (click)="clearPlace()">
+            <fa-icon icon="rotate-left"></fa-icon> Скинути фільтри
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (placeLabel() && !filtersOpen()) {
+    <div class="active-place">
+      <button type="button" class="tag place-tag" (click)="clearPlace()">
+        {{ placeLabel() }} <fa-icon icon="xmark"></fa-icon>
+      </button>
+    </div>
+  }
+
+  <!-- Results -->
+  @if (loading()) {
+    <div class="list">
+      @for (i of skeletonRows; track i) {
+        <div class="row skeleton-row">
+          <div class="skeleton sk-rank"></div>
+          <div class="skeleton sk-circle sk-52"></div>
+          <div class="row-text">
+            <div class="skeleton sk-line long"></div>
+            <div class="skeleton sk-line short"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (failed()) {
+    <div class="empty card">
+      <fa-icon icon="wifi" class="empty-icon"></fa-icon>
+      <p>Не вдалося завантажити рейтинг.</p>
+      <button class="btn btn-soft btn-sm" type="button" (click)="reload()"><fa-icon icon="rotate-right"></fa-icon> Ще раз</button>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="empty card">
+      <fa-icon icon="magnifying-glass" class="empty-icon"></fa-icon>
+      <p>{{ periodEmptyText() }}</p>
+    </div>
+  } @else {
+    @if (showPodium()) {
+      <section class="podium" aria-label="Топ-3">
+        @for (entry of podium(); track entry.id; let i = $index) {
+          <a [class]="'podium-spot place-' + (i + 1)" [routerLink]="['/teacher', entry.id]">
+            @if (i === 0) { <fa-icon icon="crown" class="podium-crown"></fa-icon> }
+            <app-avatar [src]="entry.photoUrl" [name]="entry.fullName" [size]="i === 0 ? 72 : 56" [ring]="i === 0" />
+            <span class="podium-rank">{{ entry.rank }}</span>
+            <span class="podium-name">{{ entry.fullName }}</span>
+            <span class="podium-metric"><fa-icon [icon]="metricIcon()"></fa-icon> {{ metric(entry) }}</span>
+            <span class="podium-base"></span>
+          </a>
+        }
+      </section>
+    }
+
+    <div class="list">
+      @for (entry of rest(); track entry.id) {
+        <a class="row" [routerLink]="['/teacher', entry.id]">
+          <span class="rank" [class.top]="entry.rank <= 3">{{ entry.rank }}</span>
+          <app-avatar [src]="entry.photoUrl" [name]="entry.fullName" [size]="52" />
+          <span class="row-text">
+            <span class="row-name">{{ entry.fullName }}</span>
+            <span class="row-sub">{{ departmentsLabel(entry) }}@if (entry.position) { · {{ entry.position }} }</span>
+          </span>
+          <span class="row-metric">
+            <span class="metric-main" [class.neg]="sort() === 'score' && entry.likes < entry.dislikes">
+              <fa-icon [icon]="metricIcon()"></fa-icon> {{ metric(entry) }}
+            </span>
+            @if (entry.numberOfComments > 0 && sort() !== 'comments') {
+              <span class="metric-sub"><fa-icon icon="comment"></fa-icon> {{ entry.numberOfComments }}</span>
+            }
+          </span>
+        </a>
+      }
+    </div>
+
+    @if (hasMore()) {
+      <div class="sentinel" (appInView)="loadMore()">
+        @if (loadingMore()) { <span class="spinner" aria-label="Завантаження"></span> }
+      </div>
+    } @else {
+      <p class="end muted">{{ totalCount() }} {{ totalCount() === 1 ? 'викладач' : 'викладачів' }} · це всі</p>
+    }
+  }
+</div>

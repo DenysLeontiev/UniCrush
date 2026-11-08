@@ -1,115 +1,148 @@
-import { Component, OnInit, signal, inject, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ApiService } from '../../services/api.service';
+import { LeaderboardService } from '../../services/leaderboard/leaderboard.service';
+import { SelectionStore } from '../../services/selection/selection.store';
+import { SheetsService } from '../../services/sheets/sheets.service';
 import { Institute } from '../../models/institute.model';
 import { Department } from '../../models/department.model';
-import { InstituteRenamePipe } from "../../pipes/institute-rename/institute-rename-pipe";
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { MatDialog } from '@angular/material/dialog';
-import { ShareModal } from '../../modals/share-modal/share-modal';
+import { TodaysCrush } from '../../models/leaderboard.model';
+import { InstituteRenamePipe } from '../../pipes/institute-rename/institute-rename-pipe';
+import { Avatar } from '../../shared/avatar/avatar';
 
 @Component({
   selector: 'app-selection-form',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, FormsModule, RouterLink, InstituteRenamePipe],
-  templateUrl: './selection-form.component.html',
-  styleUrl: './selection-form.component.scss'
+  imports: [FontAwesomeModule, RouterLink, InstituteRenamePipe, Avatar],
+  templateUrl: './selection-form.component.html'
 })
 export class SelectionFormComponent implements OnInit {
   private apiService = inject(ApiService);
+  private leaderboardService = inject(LeaderboardService);
   private router = inject(Router);
+  readonly selection = inject(SelectionStore);
+  readonly sheets = inject(SheetsService);
 
-  private shareModal = inject(MatDialog);
+  private readonly institutePipe = new InstituteRenamePipe();
 
   institutes = signal<Institute[]>([]);
   departments = signal<Department[]>([]);
   selectedInstituteId = signal<string>('');
   selectedDepartmentId = signal<string>('');
-  isLoading = signal(false);
+  institutesLoading = signal(true);
+  departmentsLoading = signal(false);
   error = signal<string>('');
 
-  departmentSelected = output<string>();
+  crush = signal<TodaysCrush | null>(null);
+  crushLoading = signal(true);
+
+  readonly canStart = computed(() => !!this.selectedDepartmentId() && !this.departmentsLoading());
+
+  readonly todayLabel = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' }).format(new Date());
 
   ngOnInit() {
     this.loadInstitutes();
+    this.loadCrush();
   }
 
-  public openShareModal(): void {
-    this.shareModal.open(ShareModal);
+  private loadCrush() {
+    this.leaderboardService.getTodaysCrush().subscribe({
+      next: (crush) => {
+        this.crush.set(crush);
+        this.crushLoading.set(false);
+      },
+      error: () => this.crushLoading.set(false),
+    });
   }
 
   private loadInstitutes() {
-    this.isLoading.set(true);
+    this.institutesLoading.set(true);
     this.error.set('');
 
     this.apiService.getInstitutes().subscribe({
       next: (institutes) => {
-        this.institutes.set(institutes);
-        this.isLoading.set(false);
+        const sorted = [...institutes].sort((a, b) =>
+          this.institutePipe.transform(a.name).localeCompare(this.institutePipe.transform(b.name), 'uk'));
+        this.institutes.set(sorted);
+        this.institutesLoading.set(false);
+
+        // Pre-fill with the last used department.
+        const last = this.selection.last();
+        if (last && sorted.some(i => i.id === last.instituteId)) {
+          this.selectInstitute(last.instituteId, last.departmentId);
+        }
       },
-      error: (error) => {
-        this.error.set('Сталася помилка під час завантаження інститутів. Бумб ласка, спробуйте пізніше.');
-        this.isLoading.set(false);
-        console.error('Error loading institutes:', error);
+      error: () => {
+        this.error.set('Не вдалося завантажити інститути. Спробуй трохи пізніше.');
+        this.institutesLoading.set(false);
       }
     });
   }
 
-  private loadDepartments(instituteId: string) {
-    this.isLoading.set(true);
-    this.error.set('');
-
-    this.apiService.getDepartments(instituteId).subscribe({
-      next: (departments) => {
-        this.departments.set(departments);
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        this.error.set('Сталася помилка під час завантаження кафедр. Бумб ласка, спробуйте пізніше.');
-        this.isLoading.set(false);
-        console.error('Error loading departments:', error);
-      }
-    });
-  }
-
-  onDepartmentChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement | null;
-    if (!selectElement) return;
-    const departmentId = selectElement.value;
-    const departmentName = selectElement.options[selectElement.selectedIndex].text;
-
-    this.selectedDepartmentId.set(departmentId);
-
-    this.apiService.lastSelectedDepartmentName.set(departmentName);
-  }
-
-  onInstituteChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement | null;
-    if (!selectElement) return;
-    const instituteId = selectElement.value;
-    const instituteName = selectElement.options[selectElement.selectedIndex].text;
-
+  private selectInstitute(instituteId: string, preselectDepartmentId = '') {
     this.selectedInstituteId.set(instituteId);
     this.selectedDepartmentId.set('');
     this.departments.set([]);
 
-    this.apiService.lastSelectedInstituteName.set(instituteName)
+    if (!instituteId) return;
 
-    if (instituteId) {
-      this.loadDepartments(instituteId);
-    }
+    this.departmentsLoading.set(true);
+    this.apiService.getDepartments(instituteId).subscribe({
+      next: (departments) => {
+        const sorted = [...departments].sort((a, b) => a.longName.localeCompare(b.longName, 'uk'));
+        this.departments.set(sorted);
+        this.departmentsLoading.set(false);
+        if (preselectDepartmentId && sorted.some(d => d.id === preselectDepartmentId)) {
+          this.selectedDepartmentId.set(preselectDepartmentId);
+        }
+      },
+      error: () => {
+        this.error.set('Не вдалося завантажити кафедри. Спробуй трохи пізніше.');
+        this.departmentsLoading.set(false);
+      }
+    });
+  }
+
+  onInstituteChange(event: Event) {
+    this.selectInstitute((event.target as HTMLSelectElement).value);
+  }
+
+  onDepartmentChange(event: Event) {
+    this.selectedDepartmentId.set((event.target as HTMLSelectElement).value);
   }
 
   startComparison() {
     const departmentId = this.selectedDepartmentId();
-    if (departmentId) {
-      this.router.navigate(['/comparison', departmentId]);
-    }
+    const institute = this.institutes().find(i => i.id === this.selectedInstituteId());
+    const department = this.departments().find(d => d.id === departmentId);
+    if (!departmentId || !institute || !department) return;
+
+    const instituteName = this.institutePipe.transform(institute.name).trim();
+    this.selection.save({
+      instituteId: institute.id,
+      instituteName,
+      departmentId,
+      departmentName: department.longName,
+      departmentShortName: department.shortName,
+    });
+
+    // Keep the legacy signals in sync for anything still reading them.
+    this.apiService.lastSelectedInstituteName.set(instituteName);
+    this.apiService.lastSelectedDepartmentName.set(department.longName);
+
+    this.router.navigate(['/comparison', departmentId]);
   }
 
-  canStartComparison() {
-    return this.selectedDepartmentId() && !this.isLoading();
+  openCrush() {
+    const worker = this.crush()?.worker;
+    if (worker) this.router.navigate(['/teacher', worker.id]);
+  }
+
+  likesWord(n: number): string {
+    const mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return 'вподобання';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'вподобання';
+    return 'вподобань';
   }
 }

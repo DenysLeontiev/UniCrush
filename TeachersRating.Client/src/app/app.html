@@ -1,1 +1,47 @@
-<router-outlet />
+<header class="topbar">
+  <div class="topbar-inner">
+    <a routerLink="/home" class="brand" aria-label="ЮніКраш — на головну">
+      <span class="brand-mark" aria-hidden="true">
+        <fa-icon icon="heart"></fa-icon>
+      </span>
+      <span class="brand-word">Юні<em>Краш</em></span>
+    </a>
+
+    <nav class="topnav" aria-label="Навігація">
+      <a routerLink="/home" routerLinkActive="active" class="topnav-link">Головна</a>
+      <a [routerLink]="selection.swipeLink()" class="topnav-link" routerLinkActive="active">Свайп</a>
+      <a routerLink="/leaderboard" routerLinkActive="active" class="topnav-link">Рейтинг</a>
+    </nav>
+
+    <button class="icon-btn theme-toggle" type="button" (click)="theme.toggle($event)"
+      [attr.aria-label]="theme.isDark() ? 'Увімкнути світлу тему' : 'Увімкнути темну тему'">
+      <span class="theme-icon" [class.dark]="theme.isDark()">
+        <fa-icon icon="sun" class="sun"></fa-icon>
+        <fa-icon icon="moon" class="moon"></fa-icon>
+      </span>
+    </button>
+  </div>
+</header>
+
+<main class="page">
+  <router-outlet />
+</main>
+
+<nav class="tabbar" aria-label="Навігація">
+  <a routerLink="/home" routerLinkActive="active" class="tab">
+    <span class="tab-icon"><fa-icon icon="house"></fa-icon></span>
+    <span class="tab-label">Головна</span>
+  </a>
+  <a [routerLink]="selection.swipeLink()" class="tab" routerLinkActive="active">
+    <span class="tab-icon"><fa-icon icon="heart"></fa-icon></span>
+    <span class="tab-label">Свайп</span>
+  </a>
+  <a routerLink="/leaderboard" routerLinkActive="active" class="tab">
+    <span class="tab-icon"><fa-icon icon="trophy"></fa-icon></span>
+    <span class="tab-label">Рейтинг</span>
+  </a>
+</nav>
+
+@if (toast.message(); as message) {
+  <div class="uc-toast" role="status">{{ message }}</div>
+}

@@ -1,71 +1,108 @@
-<div class="swipe-container" #container>
-  <div class="back-button-container">
-    <button class="back-btn" routerLink="/home">
-      <fa-icon icon="backward-step"></fa-icon>
-      <span class="back-text">Назад</span>
-    </button>
-  </div>
-  @if (apiService.lastSelectedDepartmentName() && apiService.lastSelectedInstituteName()) {
-  <div class="swipe-header">
-    <span class="department-name">{{ apiService.lastSelectedDepartmentName() }}</span>
-    <span class="institute-name">{{ apiService.lastSelectedInstituteName() }}</span>
-  </div>
-  }
-  <div class="comparison-area">
-    <div class="card left-card" [class.highlight-left]="swipeDirection() === 'left'"
-      [style.transform]="leftCardTransform()">
-      <div class="card-content">
-        <img [src]="currentPair()[0].photo.url" [alt]="currentPair()[0].fullName" class="card-image">
-        <div class="card-info">
-          <h3 class="card-name">{{ currentPair()[0].fullName }}</h3>
-          <p class="card-description">{{ currentPair()[0].position }}</p>
-          <div class="likes-container">
-            <div class="likes-count">
-              <fa-icon icon="thumbs-up" class="like-icon"></fa-icon>
-              <span class="likes-number">{{ currentPair()[0].numberOfLikes }}</span>
-            </div>
-            <div class="dislikes-count">
-              <fa-icon icon="thumbs-down" class="dislike-icon"></fa-icon>
-              <span class="dislikes-number">{{ currentPair()[0].numberOfDislikes }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="selection-overlay">
-          <div class="selection-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="swipe">
 
-    <div class="card right-card" [class.highlight-right]="swipeDirection() === 'right'"
-      [style.transform]="rightCardTransform()">
-      <div class="card-content">
-        <img [src]="currentPair()[1].photo.url" [alt]="currentPair()[1].fullName" class="card-image">
-        <div class="card-info">
-          <h3 class="card-name">{{ currentPair()[1].fullName }}</h3>
-          <p class="card-description">{{ currentPair()[1].position }}</p>
-          <div class="likes-container">
-            <div class="likes-count">
-              <fa-icon icon="thumbs-up" class="like-icon"></fa-icon>
-              <span class="likes-number">{{ currentPair()[1].numberOfLikes }}</span>
-            </div>
-            <div class="dislikes-count">
-              <fa-icon icon="thumbs-down" class="dislike-icon"></fa-icon>
-              <span class="dislikes-number">{{ currentPair()[1].numberOfDislikes }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="selection-overlay">
-          <div class="selection-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-            </svg>
-          </div>
+  <header class="swipe-head">
+    <a class="icon-btn back" routerLink="/home" aria-label="Змінити кафедру">
+      <fa-icon icon="arrow-left"></fa-icon>
+    </a>
+    <div class="dept">
+      <span class="dept-name">{{ departmentTitle() }}</span>
+      @if (instituteTitle()) {
+        <span class="dept-inst">{{ instituteTitle() }}</span>
+      }
+    </div>
+    <span class="counter" [class.bump]="votesCount() > 0" [attr.aria-label]="'Обрано: ' + votesCount()">
+      <fa-icon icon="heart"></fa-icon> {{ votesCount() }}
+    </span>
+  </header>
+
+  <h1 class="display prompt">Хто тобі більше <em>до вподоби</em>?</h1>
+
+  @switch (phase()) {
+    @case ('error') {
+      <div class="state card">
+        <div class="state-icon"><fa-icon icon="face-frown-open"></fa-icon></div>
+        <p>{{ errorMessage() }}</p>
+        <div class="state-actions">
+          <button class="btn btn-soft" type="button" (click)="retry()"><fa-icon icon="rotate-right"></fa-icon> Ще раз</button>
+          <a class="btn btn-ghost" routerLink="/home">Інша кафедра</a>
         </div>
       </div>
+    }
+    @case ('loading') {
+      <div class="arena">
+        @for (i of [0, 1]; track i) {
+          <div class="tcard skeleton-card">
+            <div class="skeleton media-skel"></div>
+          </div>
+        }
+        <div class="vs" aria-hidden="true">VS</div>
+      </div>
+    }
+    @default {
+      <div class="arena" [class.deciding]="chosenIndex() !== null" [class.dragging]="dragging()"
+        [style.--drag.px]="dragX()"
+        (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)"
+        (pointerup)="onPointerUp($event)" (pointercancel)="cancelDrag()" (lostpointercapture)="cancelDrag()">
+        @for (worker of pair(); track worker.id; let i = $index) {
+          <div role="button" tabindex="0" class="tcard"
+            (keydown.enter)="choose(i)"
+            [class.chosen]="chosenIndex() === i"
+            [class.lost]="chosenIndex() !== null && chosenIndex() !== i"
+            [class.enter-left]="enteringIndex() === i && i === 0"
+            [class.enter-right]="enteringIndex() === i && i === 1"
+            [class.champion]="championId() === worker.id && streak() > 1"
+            [class.leaning]="leanIndex() === i"
+            [class.fading]="leanIndex() !== null && leanIndex() !== i"
+            (click)="onCardClick(i)"
+            [attr.aria-label]="'Обрати: ' + worker.fullName">
+
+            <div class="media">
+              @if (isDefaultPhoto(worker.photo.url)) {
+                <div class="mono">
+                  <span>{{ initials(worker.fullName) }}</span>
+                </div>
+              } @else {
+                <img [src]="worker.photo.url" [alt]="worker.fullName" draggable="false" />
+              }
+              <div class="shade"></div>
+            </div>
+
+            @if (championId() === worker.id && streak() > 1) {
+              <span class="streak"><fa-icon icon="fire"></fa-icon> ×{{ streak() }}</span>
+            }
+
+            <button type="button" class="comments-btn" (click)="openTeacher(worker, $event)"
+              (keydown.enter)="$event.stopPropagation()" aria-label="Коментарі та профіль">
+              <fa-icon icon="comment"></fa-icon>
+            </button>
+
+            <div class="info">
+              <h2 class="name">{{ worker.fullName }}</h2>
+              <p class="position">{{ worker.position }}</p>
+              <div class="stats">
+                <span class="stat like"><fa-icon icon="heart"></fa-icon> {{ worker.numberOfLikes }}</span>
+                <span class="stat dislike"><fa-icon icon="heart-crack"></fa-icon> {{ worker.numberOfDislikes }}</span>
+              </div>
+            </div>
+
+            @if (chosenIndex() === i) {
+              <div class="burst" aria-hidden="true">
+                <fa-icon icon="heart" class="burst-heart"></fa-icon>
+              </div>
+            }
+          </div>
+        }
+        <div class="vs" aria-hidden="true">VS</div>
+      </div>
+    }
+  }
+
+  @if (phase() !== 'error') {
+    <div class="controls">
+      <button class="btn btn-ghost btn-sm" type="button" (click)="skip()" [disabled]="phase() !== 'idle'">
+        <fa-icon icon="shuffle"></fa-icon> Інша пара
+      </button>
     </div>
-  </div>
+    <p class="hint">Тапни або свайпни в бік того, хто подобається<span class="desktop-hint"> · ← → на клавіатурі</span></p>
+  }
 </div>

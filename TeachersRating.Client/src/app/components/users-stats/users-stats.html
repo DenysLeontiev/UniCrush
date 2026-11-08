@@ -1,40 +1,37 @@
-<div class="container">
-  <div class="content-wrapper">
-    <div class="stats-card">
-      <h1 class="title">Онлайн користувачів</h1>
-      <div class="user-count">
-        <span class="count">{{presenceService.numberOfOnlineUsers$ | async}}</span>
-        <span class="label">користувачів <b>онлайн</b></span>
-      </div>
-      <button class="home-button" routerLink="/home">На головну</button>
-    </div>
+<div class="stats-page">
+  <header class="head">
+    <span class="eyebrow">Адмінка</span>
+    <h1 class="display">Хто <em>онлайн</em></h1>
+  </header>
 
-    <div class="date-section">
-      <h2 class="subtitle">Фільтр за датою</h2>
+  <section class="live card">
+    <span class="pulse" aria-hidden="true"></span>
+    <span class="count">{{ presenceService.numberOfOnlineUsers$ | async }}</span>
+    <span class="label">зараз на сайті</span>
+  </section>
 
-      <form [formGroup]="range" class="date-form" (ngSubmit)="onRangeChange()">
-        <div class="date-inputs-wrapper">
-          <mat-date-range-input [rangePicker]="picker" class="date-picker-wrapper">
-            <input class="native-input" matStartDate formControlName="start" placeholder="Початкова дата" />
-            <span class="dash">—</span>
-            <input class="native-input" matEndDate formControlName="end" placeholder="Кінцева дата" />
-          </mat-date-range-input>
-          <mat-datepicker-toggle [for]="picker" aria-label="Toggle date range"></mat-datepicker-toggle>
-        </div>
+  <section class="card range">
+    <h2 class="section-title">Період</h2>
+    <form [formGroup]="range" class="date-form" (ngSubmit)="onRangeChange()">
+      <div class="date-inputs">
+        <mat-date-range-input [rangePicker]="picker" class="date-range">
+          <input matStartDate formControlName="start" placeholder="Від" />
+          <input matEndDate formControlName="end" placeholder="До" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle [for]="picker" aria-label="Обрати дати"></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>
+      </div>
+      <div class="date-actions">
+        <button class="btn btn-primary btn-sm" type="submit">Показати</button>
+        <button class="btn btn-ghost btn-sm" type="button" (click)="range.reset({ start: null, end: null })">Очистити</button>
+      </div>
+    </form>
+  </section>
 
-        <div class="date-actions">
-          <button class="btn btn-apply" type="submit">Застосувати</button>
-          <button class="btn btn-clear" type="button"
-            (click)="range.reset({ start: null, end: null })">Очистити</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="chart-section">
-      <apx-chart [series]="chartOptions!.series!" [chart]="chartOptions!.chart!" [xaxis]="chartOptions!.xaxis!"
-        [dataLabels]="chartOptions!.dataLabels!" [grid]="chartOptions!.grid!" [stroke]="chartOptions!.stroke!"
-        [title]="chartOptions!.title!" [tooltip]="chartOptions!.tooltip!"></apx-chart>
-    </div>
-  </div>
+  <section class="card chart">
+    <apx-chart [series]="chartOptions!.series!" [chart]="chartOptions!.chart!" [xaxis]="chartOptions!.xaxis!"
+      [dataLabels]="chartOptions!.dataLabels!" [grid]="chartOptions!.grid!" [stroke]="chartOptions!.stroke!"
+      [title]="chartOptions!.title!" [tooltip]="chartOptions!.tooltip!" [colors]="chartColors"
+      [theme]="{ mode: theme.isDark() ? 'dark' : 'light' }" [fill]="chartFill"></apx-chart>
+  </section>
 </div>

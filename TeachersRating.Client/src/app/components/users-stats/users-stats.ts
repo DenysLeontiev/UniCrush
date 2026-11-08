@@ -1,7 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { PresenceService } from '../../services/presence/presence.service';
 import { AsyncPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
@@ -18,8 +17,9 @@ import {
 } from "ng-apexcharts";
 import { UsersStatsService } from '../../services/users-stats/users-stats.service';
 import { UsersStats } from '../../models/users-stats.model';
+import { ThemeService } from '../../services/theme/theme.service';
 
-import { ApexTooltip } from "ng-apexcharts";
+import { ApexTooltip, ApexFill } from "ng-apexcharts";
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -37,15 +37,13 @@ export type ChartOptions = {
   standalone: true,
   imports: [
     AsyncPipe,
-    RouterLink,
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
     NgApexchartsModule
   ],
   providers: [provideNativeDateAdapter()],
-  templateUrl: './users-stats.html',
-  styleUrls: ['./users-stats.scss']
+  templateUrl: './users-stats.html'
 })
 export class UsersStatsComponent implements OnInit, OnDestroy {
 
@@ -53,6 +51,9 @@ export class UsersStatsComponent implements OnInit, OnDestroy {
   public chartOptions?: Partial<ChartOptions>;
 
   public presenceService = inject(PresenceService);
+  public theme = inject(ThemeService);
+  public chartColors = ['#D46743'];
+  public chartFill: ApexFill = { type: 'solid', opacity: 0.12 };
   private usersStatsService = inject(UsersStatsService);
 
   public range = new FormGroup({
@@ -72,8 +73,11 @@ export class UsersStatsComponent implements OnInit, OnDestroy {
         }
       ],
       chart: {
-        height: 350,
-        type: "line",
+        height: 340,
+        type: "area",
+        background: "transparent",
+        fontFamily: "Manrope, sans-serif",
+        toolbar: { show: false },
         zoom: {
           enabled: false
         }
@@ -82,17 +86,17 @@ export class UsersStatsComponent implements OnInit, OnDestroy {
         enabled: false
       },
       stroke: {
-        curve: "straight"
+        curve: "smooth",
+        width: 3
       },
       title: {
-        text: "Графік користувачів онлайн",
-        align: "left"
+        text: "Онлайн за період",
+        align: "left",
+        style: { fontWeight: 800 }
       },
       grid: {
-        row: {
-          colors: ["#f3f3f3", "transparent"],
-          opacity: 0.5
-        }
+        borderColor: "rgba(164, 139, 124, 0.2)",
+        strokeDashArray: 4
       },
       xaxis: {
         categories: []
@@ -175,10 +179,9 @@ export class UsersStatsComponent implements OnInit, OnDestroy {
             minute: '2-digit'
           });
           
-          return `<div style="padding: 10px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; margin-bottom: 5px;">${formattedDate}</div>
-            <div style="color: #666; margin-bottom: 5px;">Час: ${formattedTime}</div>
-            <div style="color: #2196f3; font-weight: 600;">Користувачів: ${series[seriesIndex][dataPointIndex]}</div>
+          return `<div style="padding: 10px 12px; font-family: Manrope, sans-serif;">
+            <div style="font-weight: 800; margin-bottom: 4px;">${formattedDate}, ${formattedTime}</div>
+            <div style="color: #D46743; font-weight: 800;">Онлайн: ${series[seriesIndex][dataPointIndex]}</div>
           </div>`;
         }
       }

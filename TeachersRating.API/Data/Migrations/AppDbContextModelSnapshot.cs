@@ -43,6 +43,10 @@ namespace TeachersRating.API.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AuthorName")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
@@ -107,6 +111,8 @@ namespace TeachersRating.API.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentUrl");
+
                     b.HasIndex("InstituteId");
 
                     b.ToTable("Departments");
@@ -136,6 +142,8 @@ namespace TeachersRating.API.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InstituteUrl");
 
                     b.ToTable("Institutes");
                 });
@@ -230,10 +238,42 @@ namespace TeachersRating.API.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PersonalPageUrl");
+
                     b.HasIndex("PhotoId")
                         .IsUnique();
 
                     b.ToTable("Workers");
+                });
+
+            modelBuilder.Entity("TeachersRating.API.Entities.WorkerVote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsLike")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("WorkerId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkerId");
+
+                    b.HasIndex("DateCreated", "WorkerId");
+
+                    b.ToTable("WorkerVotes");
                 });
 
             modelBuilder.Entity("DepartmentWorker", b =>
@@ -291,6 +331,17 @@ namespace TeachersRating.API.Data.Migrations
                     b.Navigation("Photo");
                 });
 
+            modelBuilder.Entity("TeachersRating.API.Entities.WorkerVote", b =>
+                {
+                    b.HasOne("TeachersRating.API.Entities.Worker", "Worker")
+                        .WithMany("Votes")
+                        .HasForeignKey("WorkerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Worker");
+                });
+
             modelBuilder.Entity("TeachersRating.API.Entities.Comment", b =>
                 {
                     b.Navigation("Replies");
@@ -309,6 +360,8 @@ namespace TeachersRating.API.Data.Migrations
             modelBuilder.Entity("TeachersRating.API.Entities.Worker", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Votes");
                 });
 #pragma warning restore 612, 618
         }

@@ -14,4 +14,5 @@ public class Worker : BaseEntity
 
     public ICollection<Department> Departments { get; set; } = new List<Department>();
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+    public ICollection<WorkerVote> Votes { get; set; } = new List<WorkerVote>();
 }

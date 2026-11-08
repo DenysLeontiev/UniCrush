@@ -1,4 +1,4 @@
-# Deploying LecturerSmash on the home VPS
+# Deploying ЮніКраш (UniCrush) on the home VPS
 
 Live at **https://app.unicrush.online**.
 
@@ -14,9 +14,10 @@ it runs separately on the VPS with your token. The server needs no public IP and
 | Service    | What it does                                                                 |
 |------------|------------------------------------------------------------------------------|
 | `postgres` | Postgres 17, data in the `pgdata` Docker volume. Bound to `127.0.0.1:5432` only. |
-| `api`      | .NET 10 API. Applies EF migrations and seeds from `NulpScrapper/ouput.json` on first start. |
+| `api`      | .NET 10 API. Applies EF migrations, then syncs teachers from the newest scraper output on every start. |
 | `client`   | Angular app served by its own small Nginx.                                    |
 | `nginx`    | Entry point on host port **8081**. Routes `/api/`, `/hubs/` (WebSockets), `/swagger` to the API, everything else to the client. |
+| `scraper`  | One-off job (not started by `up`): scrapes lpnu.ua into the `scraper-data` volume. See *Updating the teacher list*. |
 
 ## Where the settings live
 
@@ -83,7 +84,28 @@ docker compose up -d --build
 
 The DB lives in the `pgdata` volume and survives rebuilds. **`docker compose down -v` deletes it.**
 
-## Backups
+## 4. Updating the teacher list (NulpScrapper)
+
+```bash
+cd LecturerSmash
+./update-teachers.sh
+```
+
+It runs the `scraper` container (≈5 min, ~115 pages of lpnu.ua), then restarts the API, which syncs the new list
+and prints a summary like `teachers +12 ~30 -4`.
+
+How the sync works ([TeachersSyncService](TeachersRating.API/Services/TeachersSync/TeachersSyncService.cs)):
+
+- Teachers are matched by their staff page URL, departments/institutes by their lpnu.ua URL.
+- New ones are added; changed names / positions / photos / departments are updated.
+- Ones no longer on lpnu.ua are **hidden, not deleted** — likes, comments and votes are kept and come back if they reappear.
+- Safety nets: the scraper writes nothing if any page fails (network / 5xx), and the API refuses a list that has
+  less than 70% of the current teachers (`TeachersImport:MinKeepRatio` in appsettings.json).
+- Source file: the newest of `/app/scraper-data/output.json` (scraper volume) and `NulpScrapper/output.json`
+  (committed, bundled into the image). To refresh the committed seed too, run the scraper locally:
+  `cd NulpScrapper && npm ci && npm start` and commit `output.json`.
+
+## 5. Backups
 
 ```bash
 # dump

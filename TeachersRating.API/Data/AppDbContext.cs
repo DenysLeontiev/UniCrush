@@ -13,9 +13,33 @@ public class AppDbContext : DbContext
     public DbSet<Photo> Photos { get; set; }
     public DbSet<UsersOnlineStat> UsersOnlineStats { get; set; }
     public DbSet<Comment> Comments { get; set; }
+    public DbSet<WorkerVote> WorkerVotes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Institutes/departments/teachers that disappear from the scraped list are soft-deleted
+        // (so their likes and comments survive and come back if they reappear). Hide them everywhere.
+        modelBuilder.Entity<Institute>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Department>().HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Worker>().HasQueryFilter(x => !x.IsDeleted);
+
+        modelBuilder.Entity<Worker>().HasIndex(x => x.PersonalPageUrl);
+        modelBuilder.Entity<Institute>().HasIndex(x => x.InstituteUrl);
+        modelBuilder.Entity<Department>().HasIndex(x => x.DepartmentUrl);
+
+        modelBuilder.Entity<Comment>()
+            .Property(x => x.AuthorName)
+            .HasMaxLength(40);
+
+        modelBuilder.Entity<WorkerVote>()
+            .HasOne(x => x.Worker)
+            .WithMany(x => x.Votes)
+            .HasForeignKey(x => x.WorkerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WorkerVote>()
+            .HasIndex(x => new { x.DateCreated, x.WorkerId });
+
         modelBuilder.Entity<Worker>()
             .HasOne(w => w.Photo)
             .WithOne(p => p.Worker)
