@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './services/admin/admin.service';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -25,9 +26,17 @@ export const routes: Routes = [
   // The old per-department top is now part of the leaderboard (filter by department).
   { path: 'top-workers', redirectTo: '/leaderboard' },
   {
-    path: 'users-stats-secret',
-    title: 'Статистика · ЮніКраш',
-    loadComponent: () => import('./components/users-stats/users-stats').then(m => m.UsersStatsComponent),
+    path: 'admin/login',
+    title: 'Вхід · Адмінка ЮніКраш',
+    loadComponent: () => import('./components/admin/admin-login/admin-login').then(m => m.AdminLogin),
   },
+  {
+    path: 'admin',
+    title: 'Дашборд · Адмінка ЮніКраш',
+    canActivate: [adminGuard],
+    loadComponent: () => import('./components/admin/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard),
+  },
+  // The old hidden stats page is now the admin dashboard.
+  { path: 'users-stats-secret', redirectTo: '/admin' },
   { path: '**', redirectTo: '/home' },
 ];

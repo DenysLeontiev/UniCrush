@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TeachersRating.API.Entities;
 
 namespace TeachersRating.API.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : DbContext, IDataProtectionKeyContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -15,6 +16,14 @@ public class AppDbContext : DbContext
     public DbSet<Comment> Comments { get; set; }
     public DbSet<WorkerVote> WorkerVotes { get; set; }
 
+    // admin + analytics
+    public DbSet<AdminUser> AdminUsers { get; set; }
+    public DbSet<Visitor> Visitors { get; set; }
+    public DbSet<AnalyticsEvent> AnalyticsEvents { get; set; }
+
+    /// <summary>ASP.NET Data Protection key ring (keeps admin logins valid across redeploys).</summary>
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Institutes/departments/teachers that disappear from the scraped list are soft-deleted
@@ -22,6 +31,46 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Institute>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Department>().HasQueryFilter(x => !x.IsDeleted);
         modelBuilder.Entity<Worker>().HasQueryFilter(x => !x.IsDeleted);
+
+        // Comments hidden by the admin (moderation) disappear from the public site.
+        modelBuilder.Entity<Comment>().HasQueryFilter(x => !x.IsDeleted);
+
+        modelBuilder.Entity<AdminUser>().HasIndex(x => x.Username).IsUnique();
+        modelBuilder.Entity<AdminUser>().Property(x => x.Username).HasMaxLength(64);
+
+        modelBuilder.Entity<Visitor>(b =>
+        {
+            b.Property(x => x.Id).HasMaxLength(64);
+            b.Property(x => x.Country).HasMaxLength(2);
+            b.Property(x => x.Device).HasMaxLength(16);
+            b.Property(x => x.Os).HasMaxLength(32);
+            b.Property(x => x.Browser).HasMaxLength(32);
+            b.HasIndex(x => x.FirstSeenAt);
+        });
+
+        modelBuilder.Entity<AnalyticsEvent>(b =>
+        {
+            b.Property(x => x.VisitorId).HasMaxLength(64);
+            b.Property(x => x.SessionId).HasMaxLength(64);
+            b.Property(x => x.Type).HasMaxLength(32);
+            b.Property(x => x.Page).HasMaxLength(32);
+            b.Property(x => x.Path).HasMaxLength(200);
+            b.Property(x => x.Value).HasMaxLength(200);
+            b.Property(x => x.Country).HasMaxLength(2);
+            b.Property(x => x.Device).HasMaxLength(16);
+            b.Property(x => x.Os).HasMaxLength(32);
+            b.Property(x => x.Browser).HasMaxLength(32);
+            b.Property(x => x.Theme).HasMaxLength(8);
+            b.Property(x => x.Language).HasMaxLength(16);
+            b.Property(x => x.Referrer).HasMaxLength(100);
+            b.Property(x => x.UtmSource).HasMaxLength(64);
+            b.Property(x => x.UtmMedium).HasMaxLength(64);
+            b.Property(x => x.UtmCampaign).HasMaxLength(64);
+            b.HasIndex(x => x.OccurredAt);
+            b.HasIndex(x => new { x.Type, x.OccurredAt });
+            b.HasIndex(x => new { x.VisitorId, x.OccurredAt });
+            b.HasIndex(x => x.SessionId);
+        });
 
         modelBuilder.Entity<Worker>().HasIndex(x => x.PersonalPageUrl);
         modelBuilder.Entity<Institute>().HasIndex(x => x.InstituteUrl);

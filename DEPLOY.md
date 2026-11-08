@@ -105,6 +105,36 @@ How the sync works ([TeachersSyncService](TeachersRating.API/Services/TeachersSy
   (committed, bundled into the image). To refresh the committed seed too, run the scraper locally:
   `cd NulpScrapper && npm ci && npm start` and commit `output.json`.
 
+## Admin dashboard (`/admin`)
+
+https://app.unicrush.online/admin — login with the account from `appsettings.json`:
+
+```json
+"Admin": { "Username": "admin", "Password": "ChangeMe_Admin_Password" }
+```
+
+**Change the password before the first deploy.** The account is created/updated from these values on every
+API start (changing them and restarting updates the login and logs out existing sessions). Login is rate-limited
+(10 attempts / 5 min per IP).
+
+What it shows (pick any date range; everything is compared with the previous period of the same length):
+
+- **Live**: who is online right now — country, page, device (updates in real time).
+- **Active users**: DAU / WAU / MAU, stickiness, average DAU; visitors, new vs returning, sessions, page views,
+  session length, bounce rate, peak concurrent users.
+- **Charts**: traffic, DAU/WAU/MAU trend, votes & comments, concurrent online; hour × weekday heatmap.
+- **Engagement**: funnel (visit → swipe → vote → profile → comment → share), most liked / disliked / commented /
+  viewed teachers, departments, popular searches, shares.
+- **Audience & devices**: countries, pages, entry pages, referrers (Telegram, Instagram…), UTM source/campaign,
+  device, OS, browser/in-app browser, screen size, theme, language.
+- **Moderation**: search comments, hide/restore (hidden = invisible on the site), delete permanently.
+
+Privacy: visitors are identified by a random id in their browser (no cookies, no IPs stored). The country comes
+from Cloudflare's `CF-IPCountry` header — keep **Network → IP Geolocation** enabled for `unicrush.online` in
+Cloudflare (on by default). Visits over the LAN (`192.168.2.116:8081`) show as "Невідомо".
+
+Share links with UTM tags to see which ones work, e.g. `https://app.unicrush.online/?utm_source=telegram&utm_campaign=launch`.
+
 ## 5. Backups
 
 ```bash

@@ -5,6 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Subject, catchError, map, of, switchMap } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { LeaderboardService } from '../../services/leaderboard/leaderboard.service';
+import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { Institute } from '../../models/institute.model';
 import { Department } from '../../models/department.model';
 import { LeaderboardEntry, LeaderboardPeriod, LeaderboardSort, TodaysCrush } from '../../models/leaderboard.model';
@@ -23,6 +24,8 @@ export class Leaderboard {
   private api = inject(ApiService);
   private leaderboard = inject(LeaderboardService);
   private router = inject(Router);
+  private analytics = inject(AnalyticsService);
+  private lastTrackedSearch = '';
   private institutePipe = new InstituteRenamePipe();
 
   readonly periods: { value: LeaderboardPeriod; label: string }[] = [
@@ -114,6 +117,12 @@ export class Leaderboard {
 
         this.failed.set(false);
         this.pageNumber.set(page);
+
+        const term = this.search().trim();
+        if (reset && term.length >= 2 && term.toLowerCase() !== this.lastTrackedSearch) {
+          this.lastTrackedSearch = term.toLowerCase();
+          this.analytics.track('search', { value: term });
+        }
         this.totalCount.set(result.totalCount);
         this.items.set(reset ? result.items : [...this.items(), ...result.items]);
       });

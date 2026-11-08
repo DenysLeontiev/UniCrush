@@ -3,6 +3,7 @@ import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { environment } from '../../../environments/environment.development';
 import { ToastService } from '../../services/toast/toast.service';
+import { AnalyticsService } from '../../services/analytics/analytics.service';
 
 @Component({
   selector: 'app-share-modal',
@@ -12,6 +13,7 @@ import { ToastService } from '../../services/toast/toast.service';
 export class ShareModal {
   private sheetRef = inject(MatBottomSheetRef<ShareModal>);
   private toast = inject(ToastService);
+  private analytics = inject(AnalyticsService);
 
   readonly url = `${environment.siteUrl}/home`;
   readonly displayUrl = this.url.replace(/^https?:\/\//, '');
@@ -23,6 +25,7 @@ export class ShareModal {
   async share(): Promise<void> {
     try {
       await navigator.share({ title: 'ЮніКраш', text: this.text, url: this.url });
+      this.analytics.track('share', { value: 'native' });
       this.sheetRef.dismiss();
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
@@ -34,11 +37,16 @@ export class ShareModal {
   async copy(): Promise<void> {
     try {
       await navigator.clipboard.writeText(this.url);
+      this.analytics.track('share', { value: 'copy' });
       this.toast.show('Посилання скопійовано ✨');
       this.sheetRef.dismiss();
     } catch {
       this.toast.show(this.url, 4000);
     }
+  }
+
+  trackTelegram(): void {
+    this.analytics.track('share', { value: 'telegram' });
   }
 
   close(): void {

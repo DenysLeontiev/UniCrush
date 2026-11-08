@@ -1,0 +1,199 @@
+<div class="dash">
+
+  <!-- Header + date range -->
+  <header class="dash-head">
+    <div class="dash-title">
+      <span class="eyebrow">Адмінка · {{ admin.username() }}</span>
+      <h1 class="display">Дашборд</h1>
+    </div>
+    <div class="dash-actions">
+      <button type="button" class="btn btn-sm" (click)="load()" [disabled]="loading()">
+        <fa-icon icon="rotate-right"></fa-icon> Оновити
+      </button>
+      <button type="button" class="btn btn-sm btn-ghost" (click)="logout()">
+        <fa-icon icon="right-from-bracket"></fa-icon> Вийти
+      </button>
+    </div>
+  </header>
+
+  <section class="range-bar card">
+    <div class="range-presets">
+      @for (p of presets; track p.value) {
+        <button type="button" class="chip" [class.active]="preset() === p.value" (click)="setPreset(p.value)">{{ p.label }}</button>
+      }
+    </div>
+    <div class="range-custom">
+      <input #fromInput type="date" class="input" [value]="from()" [max]="today" aria-label="Від" />
+      <span class="muted">—</span>
+      <input #toInput type="date" class="input" [value]="to()" [max]="today" aria-label="До" />
+      <button type="button" class="btn btn-sm btn-primary" (click)="setCustom(fromInput.value, toInput.value)">Показати</button>
+    </div>
+    <p class="range-label muted">
+      {{ rangeLabel() }}
+      @if (loading()) { <span class="spinner"></span> }
+      @else if (lastUpdated()) { · оновлено {{ lastUpdated()!.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) }} }
+    </p>
+  </section>
+
+  <!-- Live -->
+  <section class="live-panel card">
+    <div class="live-main">
+      <span class="live-dot" aria-hidden="true"></span>
+      <div>
+        <span class="eyebrow">Зараз онлайн</span>
+        <div class="live-count">{{ live()?.onlineVisitors ?? 0 }}</div>
+        <span class="muted live-sub">{{ live()?.openTabs ?? 0 }} відкритих вкладок · оновлюється наживо</span>
+      </div>
+    </div>
+    <div class="live-lists">
+      <app-admin-list title="Країни" [rows]="liveCountries()" valueLabel="люди" [limit]="5" />
+      <app-admin-list title="Сторінки" [rows]="livePages()" valueLabel="люди" [limit]="5" />
+      <app-admin-list title="Пристрої" [rows]="liveDevices()" valueLabel="люди" [limit]="5" />
+    </div>
+    @if ((live()?.sessions ?? []).length > 0) {
+      <div class="live-table-wrap">
+        <table class="table">
+          <thead><tr><th>Відвідувач</th><th>Країна</th><th>Пристрій</th><th>Сторінка</th><th>На сайті з</th></tr></thead>
+          <tbody>
+            @for (s of live()!.sessions; track s.visitor + s.connectedAt) {
+              <tr>
+                <td class="mono-cell">{{ s.visitor }}</td>
+                <td>{{ flag(s.country) }} {{ countryName(s.country) }}</td>
+                <td>{{ deviceName(s.device) }} · {{ s.os }} · {{ s.browser }}</td>
+                <td>{{ pageName(s.page) }} @if (s.path) { <small class="muted">{{ s.path }}</small> }</td>
+                <td>{{ s.connectedAt | timeAgo }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  @if (overview(); as o) {
+    <!-- Active users -->
+    <section class="kpi-grid active-grid">
+      @for (k of activeCards(); track k.label) {
+        <div class="kpi card">
+          <span class="kpi-label">{{ k.label }}</span>
+          <span class="kpi-value">{{ k.value }}</span>
+          <span class="kpi-hint">{{ k.hint }}</span>
+        </div>
+      }
+    </section>
+
+    <!-- KPIs -->
+    <section class="kpi-grid">
+      @for (k of kpis(); track k.label) {
+        <div class="kpi card" [title]="k.hint ?? ''">
+          <span class="kpi-label">{{ k.label }}</span>
+          <span class="kpi-value">{{ k.value }}</span>
+          @if (k.delta) { <span class="kpi-delta" [class]="'kpi-delta ' + k.delta.tone">{{ k.delta.text }}</span> }
+        </div>
+      }
+    </section>
+  } @else if (loading()) {
+    <section class="kpi-grid">
+      @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+        <div class="kpi card"><div class="skeleton sk-line short"></div><div class="skeleton sk-line lg"></div></div>
+      }
+    </section>
+  }
+
+  <!-- Charts -->
+  <section class="chart-grid">
+    <div class="panel card chart-panel wide">
+      <header class="panel-head"><h3>Трафік</h3><span class="panel-cols">{{ series()?.granularity === 'hour' ? 'по годинах' : series()?.granularity === 'week' ? 'по тижнях' : 'по днях' }}</span></header>
+      <app-admin-chart [options]="trafficChart()" />
+    </div>
+    <div class="panel card chart-panel">
+      <header class="panel-head"><h3>DAU / WAU / MAU</h3></header>
+      <app-admin-chart [options]="activeChart()" />
+    </div>
+    <div class="panel card chart-panel">
+      <header class="panel-head"><h3>Голоси та коментарі</h3></header>
+      <app-admin-chart [options]="votesChart()" />
+    </div>
+    <div class="panel card chart-panel wide">
+      <header class="panel-head"><h3>Одночасно онлайн (пік)</h3><span class="panel-cols">знімок щохвилини</span></header>
+      <app-admin-chart [options]="onlineChart()" />
+    </div>
+  </section>
+
+  <!-- Heatmap -->
+  <section class="panel card heat-panel">
+    <header class="panel-head"><h3>Коли заходять</h3><span class="panel-cols">унікальні відвідувачі · за київським часом</span></header>
+    <div class="heat-scroll">
+      <div class="heat">
+        <span></span>
+        @for (h of hours; track h) { <span class="heat-hour">{{ h % 3 === 0 ? h : '' }}</span> }
+        @for (row of heat(); track row.label) {
+          <span class="heat-day">{{ row.label }}</span>
+          @for (c of row.cells; track c.hour) {
+            <span class="heat-cell" [style.--a]="c.alpha" [title]="row.label + ' ' + c.hour + ':00 — ' + c.visitors + ' відвідувачів, ' + c.pageviews + ' переглядів'"></span>
+          }
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Engagement -->
+  <h2 class="dash-section">Залученість</h2>
+  <section class="panel card funnel-panel">
+    <header class="panel-head">
+      <h3>Воронка</h3>
+      <span class="panel-cols">{{ fmt(engagement()?.votesPerVoter ?? 0, 1) }} голосів на людину</span>
+    </header>
+    @for (step of funnel(); track step.label) {
+      <div class="funnel-step">
+        <span class="funnel-label">{{ step.label }}</span>
+        <span class="funnel-bar"><span [style.--w.%]="step.width"></span></span>
+        <span class="funnel-value"><b>{{ fmt(step.count) }}</b> <small>{{ step.pct }}</small></span>
+      </div>
+    }
+  </section>
+
+  <section class="list-grid">
+    <app-admin-list title="Найбільше лайків" [rows]="topLiked()" valueLabel="лайки" value2Label="дизлайки" />
+    <app-admin-list title="Найбільше дизлайків" [rows]="topDisliked()" valueLabel="дизлайки" value2Label="лайки" />
+    <app-admin-list title="Найбільше коментарів" [rows]="topCommented()" valueLabel="коментарі" />
+    <app-admin-list title="Найчастіше відкривали профіль" [rows]="topViewed()" valueLabel="перегляди" value2Label="люди" />
+    <app-admin-list title="Кафедри за голосами" [rows]="topDepartments()" valueLabel="лайки" value2Label="дизлайки" />
+    <app-admin-list title="Кафедри, які свайпали" [rows]="topSwiped()" valueLabel="люди" />
+    <app-admin-list title="Що шукають" [rows]="searches()" valueLabel="пошуки" value2Label="люди" [limit]="10" />
+    <app-admin-list title="Поширення" [rows]="shares()" valueLabel="разів" />
+  </section>
+
+  <!-- Audience -->
+  <h2 class="dash-section">Аудиторія</h2>
+  <section class="list-grid">
+    <app-admin-list title="Країни" [rows]="countries()" valueLabel="люди" value2Label="перегляди" [limit]="10" />
+    <app-admin-list title="Сторінки" [rows]="pages()" valueLabel="люди" value2Label="перегляди" />
+    <app-admin-list title="Сторінки входу" [rows]="entryPages()" valueLabel="сесії" />
+    <app-admin-list title="Звідки прийшли" [rows]="referrers()" valueLabel="люди" value2Label="перегляди" [limit]="10" />
+    <app-admin-list title="UTM: джерело" [rows]="utmSources()" valueLabel="люди" value2Label="перегляди" />
+    <app-admin-list title="UTM: кампанія" [rows]="utmCampaigns()" valueLabel="люди" value2Label="перегляди" />
+  </section>
+
+  <h2 class="dash-section">Пристрої</h2>
+  <section class="list-grid">
+    <app-admin-list title="Тип пристрою" [rows]="devices()" valueLabel="люди" value2Label="перегляди" />
+    <app-admin-list title="Операційна система" [rows]="os()" valueLabel="люди" value2Label="перегляди" />
+    <app-admin-list title="Браузер / застосунок" [rows]="browsers()" valueLabel="люди" value2Label="перегляди" />
+    <app-admin-list title="Ширина екрана" [rows]="screens()" valueLabel="люди" value2Label="перегляди" />
+    <app-admin-list title="Тема" [rows]="themes()" valueLabel="люди" value2Label="перегляди" />
+    <app-admin-list title="Мова браузера" [rows]="languages()" valueLabel="люди" value2Label="перегляди" />
+  </section>
+
+  <!-- Moderation -->
+  <h2 class="dash-section">Модерація</h2>
+  <app-admin-moderation />
+
+  @if (overview(); as o) {
+    <p class="dash-foot muted">
+      Усього за весь час: {{ fmt(o.totals.visitors) }} відвідувачів · {{ fmt(o.totals.likes) }} лайків · {{ fmt(o.totals.dislikes) }} дизлайків ·
+      {{ fmt(o.totals.comments) }} коментарів ({{ fmt(o.totals.hiddenComments) }} приховано) · {{ fmt(o.totals.teachers) }} викладачів.
+      Країна визначається Cloudflare; IP-адреси не зберігаються.
+    </p>
+  }
+</div>

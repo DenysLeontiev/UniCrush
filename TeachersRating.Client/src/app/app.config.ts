@@ -34,6 +34,13 @@ import {
   faUserSecret,
   faWifi,
   faXmark,
+  faLock,
+  faRightFromBracket,
+  faEye,
+  faEyeSlash,
+  faTrash,
+  faUsers,
+  faGlobe,
 } from '@fortawesome/free-solid-svg-icons';
 import { faTelegram } from '@fortawesome/free-brands-svg-icons';
 
@@ -95,6 +102,13 @@ export const appConfig: ApplicationConfig = {
           faUserSecret,
           faWifi,
           faXmark,
+          faLock,
+          faRightFromBracket,
+          faEye,
+          faEyeSlash,
+          faTrash,
+          faUsers,
+          faGlobe,
           faTelegram,
         );
         return library;

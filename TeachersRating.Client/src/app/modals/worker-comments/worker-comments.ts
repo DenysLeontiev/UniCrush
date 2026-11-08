@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommentsService } from '../../services/comments/comments.service';
 import { ToastService } from '../../services/toast/toast.service';
+import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { CommentsQueryParams } from '../../models/queryParams/commentsQueryParams.model';
 import { CommentRepliesQueryParams } from '../../models/queryParams/commentRepliesQueryParams.model';
 import { TeacherSummary } from '../../models/leaderboard.model';
@@ -34,6 +35,7 @@ export class WorkerComments implements OnInit, OnDestroy {
   readonly commentsService = inject(CommentsService);
   private toast = inject(ToastService);
   private router = inject(Router);
+  private analytics = inject(AnalyticsService);
 
   readonly composer = viewChild<ElementRef<HTMLTextAreaElement>>('composer');
 
@@ -138,6 +140,7 @@ export class WorkerComments implements OnInit, OnDestroy {
         }
         this.replyTo.set(null);
         navigator.vibrate?.(8);
+        this.analytics.track('comment', { entityId: this.data.workerId, value: parent ? 'reply' : 'comment' });
 
         if (parent) {
           // Show the thread we just replied to, freshly loaded.

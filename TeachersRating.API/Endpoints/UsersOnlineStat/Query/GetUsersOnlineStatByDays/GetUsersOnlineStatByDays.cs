@@ -25,7 +25,7 @@ public class GetUsersOnlineStatByDays : IEndpoint
             var statsDto = stats.Select(x => x.ToDto()).ToList();
 
             return Results.Ok(statsDto);
-        });
+        }).RequireAuthorization("Admin");
     }
 
     private static DateTime ToUtc(DateTime value) => value.Kind switch

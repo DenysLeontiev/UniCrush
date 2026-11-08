@@ -5,6 +5,7 @@ import { ApiService } from '../../services/api.service';
 import { LeaderboardService } from '../../services/leaderboard/leaderboard.service';
 import { SelectionStore } from '../../services/selection/selection.store';
 import { SheetsService } from '../../services/sheets/sheets.service';
+import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { Institute } from '../../models/institute.model';
 import { Department } from '../../models/department.model';
 import { TodaysCrush } from '../../models/leaderboard.model';
@@ -23,6 +24,7 @@ export class SelectionFormComponent implements OnInit {
   private router = inject(Router);
   readonly selection = inject(SelectionStore);
   readonly sheets = inject(SheetsService);
+  private analytics = inject(AnalyticsService);
 
   private readonly institutePipe = new InstituteRenamePipe();
 
@@ -131,6 +133,7 @@ export class SelectionFormComponent implements OnInit {
     this.apiService.lastSelectedInstituteName.set(instituteName);
     this.apiService.lastSelectedDepartmentName.set(department.longName);
 
+    this.analytics.track('swipe_start', { entityId: departmentId });
     this.router.navigate(['/comparison', departmentId]);
   }
 

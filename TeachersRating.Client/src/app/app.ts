@@ -5,6 +5,7 @@ import { PresenceService } from './services/presence/presence.service';
 import { ThemeService } from './services/theme/theme.service';
 import { SelectionStore } from './services/selection/selection.store';
 import { ToastService } from './services/toast/toast.service';
+import { AnalyticsService } from './services/analytics/analytics.service';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,11 @@ export class App implements OnInit, OnDestroy {
   readonly theme = inject(ThemeService);
   readonly selection = inject(SelectionStore);
   readonly toast = inject(ToastService);
+  private analytics = inject(AnalyticsService);
+
+  constructor() {
+    this.analytics.start();
+  }
 
   async ngOnInit(): Promise<void> {
     await this.presenceService.startConection();

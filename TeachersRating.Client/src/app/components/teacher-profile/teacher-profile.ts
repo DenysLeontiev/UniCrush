@@ -5,6 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LeaderboardService } from '../../services/leaderboard/leaderboard.service';
 import { SelectionStore } from '../../services/selection/selection.store';
 import { SheetsService } from '../../services/sheets/sheets.service';
+import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { TeacherProfile as Profile } from '../../models/leaderboard.model';
 import { InstituteRenamePipe } from '../../pipes/institute-rename/institute-rename-pipe';
 import { Avatar } from '../../shared/avatar/avatar';
@@ -20,6 +21,7 @@ const WEEKDAYS = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 export class TeacherProfile {
   private leaderboard = inject(LeaderboardService);
   private sheets = inject(SheetsService);
+  private analytics = inject(AnalyticsService);
   private selection = inject(SelectionStore);
   private router = inject(Router);
   private location = inject(Location);
@@ -122,6 +124,7 @@ export class TeacherProfile {
       departmentName: department.longName,
       departmentShortName: department.shortName,
     });
+    this.analytics.track('swipe_start', { entityId: department.id });
     this.router.navigate(['/comparison', department.id]);
   }
 

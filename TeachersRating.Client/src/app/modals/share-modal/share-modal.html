@@ -18,7 +18,7 @@
         <fa-icon icon="share-nodes"></fa-icon> Поділитися
       </button>
     }
-    <a class="btn btn-calm btn-block" [href]="telegramUrl" target="_blank" rel="noopener">
+    <a class="btn btn-calm btn-block" [href]="telegramUrl" target="_blank" rel="noopener" (click)="trackTelegram()">
       <fa-icon [icon]="['fab', 'telegram']"></fa-icon> У Telegram
     </a>
     <button type="button" class="btn btn-ghost btn-block" (click)="close()">Не зараз</button>

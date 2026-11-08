@@ -11,12 +11,20 @@ public class AppCalendar
     public AppCalendar(IConfiguration configuration, ILogger<AppCalendar> logger)
     {
         string id = configuration["TimeZone"] ?? "Europe/Kyiv";
+        TimeZoneId = id;
         _timeZone = Resolve(id, logger);
     }
 
     public DateTime NowLocal => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _timeZone);
 
     public DateOnly Today => DateOnly.FromDateTime(NowLocal);
+
+    /// <summary>IANA id used for Postgres "AT TIME ZONE" bucketing.</summary>
+    public string TimeZoneId { get; }
+
+    /// <summary>UTC instant when the given local calendar day starts.</summary>
+    public DateTime LocalDateToUtc(DateOnly date) =>
+        TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(date.ToDateTime(TimeOnly.MinValue), DateTimeKind.Unspecified), _timeZone);
 
     /// <summary>Local calendar date of a UTC instant.</summary>
     public DateOnly ToLocalDate(DateTime utc) =>

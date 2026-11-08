@@ -4,6 +4,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ApiService } from '../../services/api.service';
 import { SelectionStore } from '../../services/selection/selection.store';
 import { SheetsService } from '../../services/sheets/sheets.service';
+import { AnalyticsService } from '../../services/analytics/analytics.service';
 import { Worker } from '../../models/worker.model';
 import { isDefaultPhoto, teacherInitials } from '../../shared/avatar/avatar';
 
@@ -29,6 +30,7 @@ export class SwipeComparisonComponent {
   private apiService = inject(ApiService);
   private selection = inject(SelectionStore);
   private sheets = inject(SheetsService);
+  private analytics = inject(AnalyticsService);
 
   /** Bound from the route (:departmentId). */
   readonly departmentId = input.required<string>();
@@ -168,6 +170,7 @@ export class SwipeComparisonComponent {
       : w.id === loser.id ? { ...w, numberOfDislikes: w.numberOfDislikes + 1 }
       : w));
 
+    this.analytics.track('vote', { entityId: winner.id });
     this.apiService.likeWorker(winner.id).subscribe({ error: (e) => console.warn('Like failed', e) });
     this.apiService.dislikeWorker(loser.id).subscribe({ error: (e) => console.warn('Dislike failed', e) });
 
