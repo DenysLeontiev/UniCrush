@@ -25,6 +25,11 @@ public class ContinuousBackgroundService<TIteration> : BackgroundService where T
 
                 await iteration.Run(stoppingToken);
             }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                // normal shutdown
+                break;
+            }
             catch (Exception ex)
             {
                 await TIteration.OnException(ex, _logger);

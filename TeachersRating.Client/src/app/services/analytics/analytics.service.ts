@@ -16,7 +16,8 @@ interface QueuedEvent {
 const VISITOR_KEY = 'uc-vid';
 const SESSION_KEY = 'uc-session';
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
-const FLUSH_INTERVAL_MS = 5000;
+/** Events are sent in batches: every 10 s, at 20 queued events, or when the tab is hidden/closed. */
+const FLUSH_INTERVAL_MS = 10_000;
 
 function randomId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto

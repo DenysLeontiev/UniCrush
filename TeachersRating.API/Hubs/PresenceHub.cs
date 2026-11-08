@@ -8,17 +8,19 @@ namespace TeachersRating.API.Hubs;
 
 /// <summary>
 /// Every open tab connects here (?v=visitorId). Admins join "AdminGroup" and receive a live
-/// snapshot (who is online, from where, on which page) whenever something changes.
+/// snapshot (who is online, from where, on which page) — coalesced by LiveSnapshotBroadcaster.
 /// </summary>
 public partial class PresenceHub : Hub
 {
     public const string AdminGroup = "AdminGroup";
 
     private readonly IPresenceTrackerService _presenceTracker;
+    private readonly LiveSnapshotBroadcaster _broadcaster;
 
-    public PresenceHub(IPresenceTrackerService presenceTracker)
+    public PresenceHub(IPresenceTrackerService presenceTracker, LiveSnapshotBroadcaster broadcaster)
     {
         _presenceTracker = presenceTracker;
+        _broadcaster = broadcaster;
     }
 
     public override async Task OnConnectedAsync()
@@ -37,22 +39,22 @@ public partial class PresenceHub : Hub
         _presenceTracker.UserConnected(new OnlineConnection(
             Context.ConnectionId, visitorId, client.Country, client.Device, client.Os, client.Browser, DateTime.UtcNow));
 
-        await NotifyAdmins();
+        _broadcaster.MarkDirty();
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         _presenceTracker.UserDisconnected(Context.ConnectionId);
-        await NotifyAdmins();
+        _broadcaster.MarkDirty();
         await base.OnDisconnectedAsync(exception);
     }
 
     /// <summary>Called by the client on every route change.</summary>
-    public async Task SetPage(string path)
+    public void SetPage(string path)
     {
         _presenceTracker.SetPage(Context.ConnectionId, path);
-        await NotifyAdmins();
+        _broadcaster.MarkDirty();
     }
 
     [Authorize(Policy = "Admin")]
@@ -61,7 +63,7 @@ public partial class PresenceHub : Hub
         _presenceTracker.MarkAdmin(Context.ConnectionId);
         await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroup);
         await Clients.Caller.SendAsync("PresenceSnapshot", LiveSnapshot.From(_presenceTracker));
-        await NotifyAdmins();
+        _broadcaster.MarkDirty(); // this admin no longer counts as a visitor
     }
 
     [Authorize(Policy = "Admin")]
@@ -69,9 +71,6 @@ public partial class PresenceHub : Hub
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, AdminGroup);
     }
-
-    private Task NotifyAdmins() =>
-        Clients.Group(AdminGroup).SendAsync("PresenceSnapshot", LiveSnapshot.From(_presenceTracker));
 
     [GeneratedRegex("^[A-Za-z0-9-]{8,64}$")]
     private static partial Regex VisitorIdRegex();

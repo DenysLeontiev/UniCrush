@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
-using TeachersRating.API.Data;
 using TeachersRating.API.Entities;
 using TeachersRating.API.Interfaces;
 using TeachersRating.API.Services.Analytics;
@@ -36,14 +35,17 @@ public class TrackRequestDto
     public List<TrackEventDto> Events { get; set; } = new();
 }
 
-/// <summary>Batched analytics events from the browser (also accepts navigator.sendBeacon).</summary>
+/// <summary>
+/// Batched analytics events from the browser (also accepts navigator.sendBeacon).
+/// Validates and enriches them, then hands them to the background writer — no DB work in the request.
+/// </summary>
 public partial class TrackEvents : IEndpoint
 {
     private static readonly HashSet<string> AllowedTypes = ["pageview", "vote", "comment", "search", "swipe_start", "share"];
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("track", async ([FromBody] TrackRequestDto request, [FromServices] AppDbContext context, HttpContext http) =>
+        app.MapPost("track", ([FromBody] TrackRequestDto request, [FromServices] AnalyticsQueue queue, HttpContext http) =>
         {
             string visitorId = request.VisitorId ?? string.Empty;
             string sessionId = request.SessionId ?? string.Empty;
@@ -103,34 +105,8 @@ public partial class TrackEvents : IEndpoint
                 return Results.NoContent();
             }
 
-            var visitor = await context.Visitors.FindAsync(visitorId);
-            var firstAt = events.Min(e => e.OccurredAt);
-            var lastAt = events.Max(e => e.OccurredAt);
-
-            if (visitor is null)
-            {
-                visitor = new Visitor { Id = visitorId, FirstSeenAt = firstAt };
-                context.Visitors.Add(visitor);
-            }
-
-            visitor.LastSeenAt = lastAt > visitor.LastSeenAt ? lastAt : visitor.LastSeenAt;
-            visitor.Country = client.Country;
-            visitor.Device = client.Device;
-            visitor.Os = client.Os;
-            visitor.Browser = client.Browser;
-
-            context.AnalyticsEvents.AddRange(events);
-
-            try
-            {
-                await context.SaveChangesAsync();
-            }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
-            {
-                // Two first batches of a brand-new visitor raced; the other one created the visitor.
-                return Results.NoContent();
-            }
-
+            // Queue only: the background AnalyticsWriter writes to the database in batches.
+            queue.TryEnqueue(new TrackBatch(visitorId, client, events));
             return Results.NoContent();
         }).RequireRateLimiting("track");
     }

@@ -9,6 +9,8 @@ using TeachersRating.API.Data;
 using TeachersRating.API.Interfaces;
 using TeachersRating.API.Services;
 using TeachersRating.API.Services.TeachersSync;
+using TeachersRating.API.Services.Analytics;
+using TeachersRating.API.Hubs;
 
 namespace TeachersRating.API.Extensions;
 
@@ -50,6 +52,14 @@ public static class ServicesExtentions
         services.AddSingleton<IPresenceTrackerService, PresenceTrackerService>();
         services.AddSingleton<AppCalendar>();
         services.AddScoped<TeachersSyncService>();
+
+        // Analytics: request -> in-memory queue -> batched background writer.
+        services.AddSingleton<AnalyticsQueue>();
+        services.AddHostedService<AnalyticsWriter>();
+
+        // Live admin snapshots, coalesced to at most one push every 2 s.
+        services.AddSingleton<LiveSnapshotBroadcaster>();
+        services.AddHostedService(sp => sp.GetRequiredService<LiveSnapshotBroadcaster>());
 
         return services;
     }
