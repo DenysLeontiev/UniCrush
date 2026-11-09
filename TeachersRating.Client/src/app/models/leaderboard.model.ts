@@ -1,5 +1,5 @@
 export type LeaderboardPeriod = 'today' | 'week' | 'all';
-export type LeaderboardSort = 'likes' | 'score' | 'comments';
+export type LeaderboardSort = 'likes' | 'comments';
 
 export interface LeaderboardDepartment {
   id: string;

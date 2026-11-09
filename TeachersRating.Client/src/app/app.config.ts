@@ -1,6 +1,7 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withViewTransitions } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { TrackingErrorHandler, errorTrackingInterceptor } from './services/analytics/error-tracking';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import {
   faArrowLeft,
@@ -64,7 +65,8 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
       withComponentInputBinding()
     ),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([errorTrackingInterceptor])),
+    { provide: ErrorHandler, useClass: TrackingErrorHandler },
     {
       provide: FaIconLibrary,
       useFactory: () => {

@@ -128,3 +128,41 @@ export interface AdminComment {
   workerId: string;
   workerName: string;
 }
+
+export type OnlineGranularity = 'minute' | 'hour' | 'day' | 'week' | 'month';
+
+export interface DashboardOnline {
+  granularity: OnlineGranularity;
+  now: number;
+  average: number | null;
+  peak: { value: number; at: string } | null;
+  samples: number;
+  points: { bucket: string; avg: number | null; peak: number | null; samples: number }[];
+  byHour: { hour: number; avg: number | null; peak: number | null }[];
+  byWeekday: { dow: number; avg: number | null; peak: number | null }[];
+}
+
+export interface PerfRow {
+  key: string;
+  median: number;
+  p75: number;
+  samples: number;
+}
+
+export interface DashboardBehavior {
+  engagedSeconds: number;
+  avgSecondsPerVisitor: number;
+  avgSecondsPerSession: number;
+  timeByPage: BreakdownRow[];
+  voteMethods: CountRow[];
+  votes: number;
+  skips: number;
+  skipRate: number;
+  filters: CountRow[];
+  loadMore: CountRow[];
+  openComments: CountRow[];
+  outbound: CountRow[];
+  themeToggles: CountRow[];
+  errors: CountRow[];
+  perfByDevice: PerfRow[];
+}

@@ -152,7 +152,7 @@ export class SwipeComparisonComponent {
     });
   }
 
-  choose(index: number) {
+  choose(index: number, method: 'tap' | 'swipe' | 'key' = 'tap') {
     if (this.phase() !== 'idle') return;
     const pair = this.pair();
     if (pair.length !== 2) return;
@@ -170,7 +170,7 @@ export class SwipeComparisonComponent {
       : w.id === loser.id ? { ...w, numberOfDislikes: w.numberOfDislikes + 1 }
       : w));
 
-    this.analytics.track('vote', { entityId: winner.id });
+    this.analytics.track('vote', { entityId: winner.id, value: method });
     this.apiService.likeWorker(winner.id).subscribe({ error: (e) => console.warn('Like failed', e) });
     this.apiService.dislikeWorker(loser.id).subscribe({ error: (e) => console.warn('Dislike failed', e) });
 
@@ -218,7 +218,7 @@ export class SwipeComparisonComponent {
     this.cancelDrag();
 
     if (wasDragging && Math.abs(x) >= SWIPE_THRESHOLD) {
-      this.choose(x < 0 ? 0 : 1);
+      this.choose(x < 0 ? 0 : 1, 'swipe');
     }
   }
 
@@ -238,6 +238,7 @@ export class SwipeComparisonComponent {
   }
 
   skip() {
+    if (this.phase() === 'idle') this.analytics.track('skip');
     if (this.phase() === 'choosing' || this.phase() === 'loading') return;
     this.streak.set(0);
     this.championId.set(null);
@@ -268,8 +269,8 @@ export class SwipeComparisonComponent {
     if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
     if (document.querySelector('.mat-bottom-sheet-container')) return;
 
-    if (event.key === 'ArrowLeft') this.choose(0);
-    else if (event.key === 'ArrowRight') this.choose(1);
+    if (event.key === 'ArrowLeft') this.choose(0, 'key');
+    else if (event.key === 'ArrowRight') this.choose(1, 'key');
     else if (event.key === ' ' || event.key === 'ArrowDown') {
       event.preventDefault();
       this.skip();

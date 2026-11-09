@@ -41,7 +41,12 @@ public class TrackRequestDto
 /// </summary>
 public partial class TrackEvents : IEndpoint
 {
-    private static readonly HashSet<string> AllowedTypes = ["pageview", "vote", "comment", "search", "swipe_start", "share"];
+    private static readonly HashSet<string> AllowedTypes =
+    [
+        "pageview", "vote", "comment", "search", "swipe_start", "share",
+        // behaviour
+        "engage", "skip", "filter", "load_more", "open_comments", "outbound", "theme", "error", "perf",
+    ];
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

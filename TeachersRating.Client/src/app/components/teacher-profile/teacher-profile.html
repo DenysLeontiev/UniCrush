@@ -125,7 +125,7 @@
         </button>
       }
       @if (p.personalPageUrl) {
-        <a class="btn btn-ghost btn-block" [href]="p.personalPageUrl" target="_blank" rel="noopener">
+        <a class="btn btn-ghost btn-block" [href]="p.personalPageUrl" target="_blank" rel="noopener" (click)="trackOutbound(p.id)">
           Сторінка на lpnu.ua <fa-icon icon="arrow-up-right-from-square"></fa-icon>
         </a>
       }

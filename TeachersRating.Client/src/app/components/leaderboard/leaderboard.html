@@ -158,7 +158,7 @@
             <span class="row-sub">{{ departmentsLabel(entry) }}@if (entry.position) { · {{ entry.position }} }</span>
           </span>
           <span class="row-metric">
-            <span class="metric-main" [class.neg]="sort() === 'score' && entry.likes < entry.dislikes">
+            <span class="metric-main">
               <fa-icon [icon]="metricIcon()"></fa-icon> {{ metric(entry) }}
             </span>
             @if (entry.numberOfComments > 0 && sort() !== 'comments') {

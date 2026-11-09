@@ -79,6 +79,10 @@ export class WorkerComments implements OnInit, OnDestroy {
     this.sheetRef.dismiss();
   }
 
+  trackOutbound(): void {
+    this.analytics.track('outbound', { entityId: this.data.workerId, value: 'lpnu' });
+  }
+
   openProfile(): void {
     this.sheetRef.dismiss();
     this.router.navigate(['/teacher', this.data.workerId]);

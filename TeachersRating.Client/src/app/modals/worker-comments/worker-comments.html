@@ -16,7 +16,7 @@
           </button>
         }
         @if (t.personalPageUrl) {
-          <a class="stat" [href]="t.personalPageUrl" target="_blank" rel="noopener">
+          <a class="stat" [href]="t.personalPageUrl" target="_blank" rel="noopener" (click)="trackOutbound()">
             lpnu.ua <fa-icon icon="arrow-up-right-from-square"></fa-icon>
           </a>
         }

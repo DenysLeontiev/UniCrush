@@ -21,14 +21,11 @@ public class TrackOnlineUsersIteration : IContinuousWorkIteration
 
     public async Task Run(CancellationToken stoppingToken)
     {
-        int minutesAhead = 1;
-
+        // Sample on every whole minute (hh:mm:00) so hourly/daily buckets line up exactly.
         var now = DateTime.UtcNow;
-        var nMinutesAhead = now.AddMinutes(minutesAhead);
+        var nextMinute = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, DateTimeKind.Utc).AddMinutes(1);
 
-        TimeSpan delay = nMinutesAhead - now;
-
-        await Task.Delay(delay, stoppingToken);
+        await Task.Delay(nextMinute - now, stoppingToken);
 
         int onlineUsers = _presenceTracker.GetNumberOfOnlineUsers();
 
@@ -37,8 +34,8 @@ public class TrackOnlineUsersIteration : IContinuousWorkIteration
 
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation(
-            "Hourly run at {time}: {count} users online",
+        _logger.LogDebug(
+            "Online snapshot at {time}: {count} users online",
             DateTime.UtcNow,
             onlineUsers
         );

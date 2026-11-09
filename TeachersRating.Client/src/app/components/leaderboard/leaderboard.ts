@@ -36,7 +36,6 @@ export class Leaderboard {
 
   readonly sorts: { value: LeaderboardSort; label: string; icon: string }[] = [
     { value: 'likes', label: 'Найбільше ❤', icon: 'heart' },
-    { value: 'score', label: 'Баланс', icon: 'scale-balanced' },
     { value: 'comments', label: 'Обговорювані', icon: 'comment' },
   ];
 
@@ -143,6 +142,8 @@ export class Leaderboard {
   loadMore() {
     if (this.loading() || this.loadingMore() || !this.hasMore() || this.failed()) return;
     this.loadingMore.set(true);
+    // Scroll depth: which page of the list people reach.
+    this.analytics.track('load_more', { value: String(this.pageNumber() + 1) });
     this.load$.next({ reset: false });
   }
 
@@ -175,6 +176,7 @@ export class Leaderboard {
   setPeriod(period: LeaderboardPeriod) {
     if (this.period() === period) return;
     this.period.set(period);
+    this.analytics.track('filter', { value: `period:${period}` });
     this.loading.set(true);
     this.load$.next({ reset: true });
   }
@@ -182,6 +184,7 @@ export class Leaderboard {
   setSort(sort: LeaderboardSort) {
     if (this.sort() === sort) return;
     this.sort.set(sort);
+    this.analytics.track('filter', { value: `sort:${sort}` });
     this.loading.set(true);
     this.load$.next({ reset: true });
   }
@@ -189,6 +192,7 @@ export class Leaderboard {
   onInstituteChange(event: Event) {
     const id = (event.target as HTMLSelectElement).value;
     this.instituteId.set(id);
+    this.analytics.track('filter', { value: id ? 'institute' : 'institute:all' });
     this.departmentId.set('');
     this.departments.set([]);
     if (id) {
@@ -200,6 +204,7 @@ export class Leaderboard {
 
   onDepartmentChange(event: Event) {
     this.departmentId.set((event.target as HTMLSelectElement).value);
+    this.analytics.track('filter', { value: this.departmentId() ? 'department' : 'department:all' });
     this.reload();
   }
 
@@ -220,10 +225,6 @@ export class Leaderboard {
 
   metric(entry: LeaderboardEntry): string {
     switch (this.sort()) {
-      case 'score': {
-        const score = entry.likes - entry.dislikes;
-        return score > 0 ? `+${score}` : `${score}`;
-      }
       case 'comments':
         return `${entry.numberOfComments}`;
       default:
@@ -232,7 +233,7 @@ export class Leaderboard {
   }
 
   metricIcon(): string {
-    return this.sort() === 'comments' ? 'comment' : this.sort() === 'score' ? 'scale-balanced' : 'heart';
+    return this.sort() === 'comments' ? 'comment' : 'heart';
   }
 
   periodEmptyText(): string {

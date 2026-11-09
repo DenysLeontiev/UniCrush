@@ -70,6 +70,48 @@
     }
   </section>
 
+
+  <!-- Online users over time -->
+  <section class="panel card online-panel">
+    <header class="panel-head online-head">
+      <h3>Онлайн за період</h3>
+      <div class="online-units">
+        @for (u of onlineUnits; track u.label) {
+          <button type="button" class="chip" [class.active]="onlineUnit() === u.value" (click)="setOnlineUnit(u.value)">{{ u.label }}</button>
+        }
+      </div>
+    </header>
+
+    <div class="online-cards">
+      @for (c of onlineCards(); track c.label) {
+        <div class="online-card">
+          <span class="kpi-label">{{ c.label }}</span>
+          <span class="kpi-value">{{ c.value }}</span>
+          <span class="kpi-hint">{{ c.hint }}</span>
+        </div>
+      }
+    </div>
+
+    <app-admin-chart [options]="onlineChart()" />
+    @if (online(); as o) {
+      <p class="muted online-note">
+        Крок: {{ o.granularity === 'minute' ? 'хвилина' : o.granularity === 'hour' ? 'година' : o.granularity === 'day' ? 'день' : o.granularity === 'week' ? 'тиждень' : 'місяць' }}
+        · середнє та пік одночасних відвідувачів у кожному інтервалі · порожні місця = сервер не працював
+      </p>
+    }
+
+    <div class="online-profiles">
+      <div>
+        <h4 class="profile-title">За годинами доби</h4>
+        <app-admin-chart [options]="onlineByHourChart()" />
+      </div>
+      <div>
+        <h4 class="profile-title">За днями тижня</h4>
+        <app-admin-chart [options]="onlineByWeekdayChart()" />
+      </div>
+    </div>
+  </section>
+
   @if (overview(); as o) {
     <!-- Active users -->
     <section class="kpi-grid active-grid">
@@ -113,10 +155,6 @@
     <div class="panel card chart-panel">
       <header class="panel-head"><h3>Голоси та коментарі</h3></header>
       <app-admin-chart [options]="votesChart()" />
-    </div>
-    <div class="panel card chart-panel wide">
-      <header class="panel-head"><h3>Одночасно онлайн (пік)</h3><span class="panel-cols">знімок щохвилини</span></header>
-      <app-admin-chart [options]="onlineChart()" />
     </div>
   </section>
 
@@ -162,6 +200,29 @@
     <app-admin-list title="Кафедри, які свайпали" [rows]="topSwiped()" valueLabel="люди" />
     <app-admin-list title="Що шукають" [rows]="searches()" valueLabel="пошуки" value2Label="люди" [limit]="10" />
     <app-admin-list title="Поширення" [rows]="shares()" valueLabel="разів" />
+  </section>
+
+  <!-- Behaviour -->
+  <h2 class="dash-section">Поведінка</h2>
+  <section class="kpi-grid">
+    @for (k of behaviorCards(); track k.label) {
+      <div class="kpi card">
+        <span class="kpi-label">{{ k.label }}</span>
+        <span class="kpi-value">{{ k.value }}</span>
+        <span class="kpi-hint">{{ k.hint }}</span>
+      </div>
+    }
+  </section>
+  <section class="list-grid">
+    <app-admin-list title="Як голосують" [rows]="voteMethods()" valueLabel="голоси" value2Label="люди" />
+    <app-admin-list title="Активний час за сторінками" [rows]="timeByPage()" valueLabel="хвилини" value2Label="люди" />
+    <app-admin-list title="Фільтри рейтингу" [rows]="filtersUsed()" valueLabel="разів" value2Label="люди" [limit]="10" />
+    <app-admin-list title="Глибина прокрутки рейтингу" [rows]="scrollDepth()" valueLabel="люди" value2Label="разів" [limit]="10" />
+    <app-admin-list title="Відкриття коментарів" [rows]="openComments()" valueLabel="разів" value2Label="люди" />
+    <app-admin-list title="Переходи на інші сайти" [rows]="outbound()" valueLabel="разів" value2Label="люди" />
+    <app-admin-list title="Перемикання теми" [rows]="themeToggles()" valueLabel="разів" value2Label="люди" />
+    <app-admin-list title="Швидкість завантаження" [rows]="perf()" valueLabel="медіана, мс" value2Label="p75, мс" />
+    <app-admin-list title="Помилки" [rows]="errors()" valueLabel="разів" value2Label="люди" [limit]="10" />
   </section>
 
   <!-- Audience -->

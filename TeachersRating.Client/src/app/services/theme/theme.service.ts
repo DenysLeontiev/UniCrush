@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 export type Theme = 'light' | 'dark';
 
@@ -11,6 +12,7 @@ const THEME_COLORS: Record<Theme, string> = { light: '#FFFAF5', dark: '#15110F' 
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
+  private analytics = inject(AnalyticsService);
   private readonly media = window.matchMedia('(prefers-color-scheme: dark)');
   private readonly systemTheme = signal<Theme>(this.media.matches ? 'dark' : 'light');
   private readonly override = signal<Theme | null>(this.readOverride());
@@ -30,6 +32,7 @@ export class ThemeService {
 
   toggle(event?: Event): void {
     const next: Theme = this.isDark() ? 'light' : 'dark';
+    this.analytics.track('theme', { value: next });
     this.override.set(next === this.systemTheme() ? null : next);
     this.persist();
     this.apply(next, event ?? null);

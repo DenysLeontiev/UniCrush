@@ -4,7 +4,8 @@ import { CanActivateFn, Router } from '@angular/router';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import {
-  AdminComment, DashboardBreakdowns, DashboardEngagement, DashboardOverview, DashboardTimeseries, LiveSnapshot,
+  AdminComment, DashboardBehavior, DashboardBreakdowns, DashboardEngagement, DashboardOnline, DashboardOverview,
+  DashboardTimeseries, LiveSnapshot, OnlineGranularity,
 } from '../../models/admin.model';
 import { PaginatedList } from '../../models/pagination/paginatedList.model';
 
@@ -42,6 +43,10 @@ export class AdminService {
   breakdowns(from: string, to: string) { return this.get<DashboardBreakdowns>('dashboard/breakdowns', { from, to }); }
   engagement(from: string, to: string) { return this.get<DashboardEngagement>('dashboard/engagement', { from, to }); }
   live() { return this.get<LiveSnapshot>('dashboard/live', {}); }
+  online(from: string, to: string, granularity: OnlineGranularity | null) {
+    return this.get<DashboardOnline>('dashboard/online', { from, to, granularity: granularity ?? '' });
+  }
+  behavior(from: string, to: string) { return this.get<DashboardBehavior>('dashboard/behavior', { from, to }); }
 
   comments(query: { search?: string; status?: string; pageNumber: number; pageSize: number }) {
     return this.get<PaginatedList<AdminComment>>('comments', {

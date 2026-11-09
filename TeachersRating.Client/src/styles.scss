@@ -1222,7 +1222,6 @@ app-leaderboard {
     font-size: var(--text-sm);
 
     fa-icon { color: var(--like); font-size: var(--text-xs); }
-    &.neg fa-icon { color: var(--dislike); }
   }
 
   .metric-sub { display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); color: var(--ink-3); }
@@ -1925,6 +1924,42 @@ app-admin-dashboard {
   .funnel-value { min-width: 80px; text-align: right; small { color: var(--ink-3); margin-left: var(--space-1); } }
 
   .list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-3); }
+
+  /* online users over time */
+  .online-panel { display: flex; flex-direction: column; gap: var(--space-3); }
+  .online-head { flex-wrap: wrap; margin-bottom: 0; }
+
+  .online-units {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    .chip { height: 30px; font-size: var(--text-xs); }
+  }
+
+  .online-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-2); }
+
+  .online-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-3);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+  }
+
+  .online-note { font-size: var(--text-xs); }
+
+  .online-profiles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+
+    @media (min-width: 900px) { grid-template-columns: 1fr 1fr; }
+  }
+
+  .profile-title { font-size: var(--text-xs); font-weight: 700; color: var(--ink-2); margin: 0 0 var(--space-1); }
 
   .dash-foot { font-size: var(--text-xs); padding: var(--space-4) 0; }
 }

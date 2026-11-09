@@ -93,6 +93,10 @@ export class TeacherProfile {
     });
   }
 
+  trackOutbound(id: string) {
+    this.analytics.track('outbound', { entityId: id, value: 'lpnu' });
+  }
+
   back() {
     if (window.history.length > 1) this.location.back();
     else this.router.navigate(['/leaderboard']);

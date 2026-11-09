@@ -45,7 +45,7 @@
         (pointerup)="onPointerUp($event)" (pointercancel)="cancelDrag()" (lostpointercapture)="cancelDrag()">
         @for (worker of pair(); track worker.id; let i = $index) {
           <div role="button" tabindex="0" class="tcard"
-            (keydown.enter)="choose(i)"
+            (keydown.enter)="choose(i, 'key')"
             [class.chosen]="chosenIndex() === i"
             [class.lost]="chosenIndex() !== null && chosenIndex() !== i"
             [class.enter-left]="enteringIndex() === i && i === 0"

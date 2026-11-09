@@ -17,7 +17,7 @@ public class LeaderboardQueryParams
     /// <summary>all | week | today</summary>
     public string? Period { get; set; }
 
-    /// <summary>likes | score | comments</summary>
+    /// <summary>likes | comments</summary>
     public string? Sort { get; set; }
 
     // Nullable so minimal APIs treat them as optional.
@@ -91,7 +91,6 @@ public class GetLeaderboard : IEndpoint
 
             scored = query.Sort?.ToLowerInvariant() switch
             {
-                "score" => scored.OrderByDescending(x => x.Likes - x.Dislikes).ThenByDescending(x => x.Likes).ThenBy(x => x.FullName),
                 "comments" => scored.OrderByDescending(x => x.Comments).ThenByDescending(x => x.Likes).ThenBy(x => x.FullName),
                 _ => scored.OrderByDescending(x => x.Likes).ThenBy(x => x.Dislikes).ThenBy(x => x.FullName),
             };
